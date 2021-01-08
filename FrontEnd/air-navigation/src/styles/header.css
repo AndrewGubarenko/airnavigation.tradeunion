@@ -1,0 +1,44 @@
+.header-container {
+  width: 100%;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: row;
+  position: absolute;
+}
+
+.logo-container {
+  width: 20%;
+  margin-left: 3vw;
+}
+
+#logo {
+  width: 200px;
+  height: 200px;
+}
+
+#logo:hover {
+  cursor: pointer;
+}
+
+.menu-container {
+  width: 80%;
+}
+
+.menu-ul {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.menu-li {
+  width: auto;
+  margin: 0 50px;
+  list-style-type: none;
+  font-size: 24px;
+  transition: color 0.2s linear;
+}
+
+.menu-li:hover {
+  cursor: pointer;
+  color: darkgrey;
+}

@@ -1,0 +1,122 @@
+.main_admin_content {
+  display: flex;
+  flex-direction: row;
+  min-height: calc(100vh - 70px);
+}
+
+.admin_menu {
+  width: 18%;
+  min-height: 100%;
+  background-color: white;
+  padding: 250px 50px 10px 10px;
+  text-align: right;
+  font-size: 24px;
+}
+
+.admin_menu:hover {
+  cursor: pointer;
+}
+
+.admin_menu_list {
+  margin-top: 0;
+}
+
+.admin_menu_list_item {
+  margin-top: 20px;
+  list-style: none;
+  transition: color 0.2s linear;
+}
+
+.admin_menu_list_item:hover {
+  color: darkgrey;
+}
+#screen {
+  min-height: 100%;
+  width: 80%;
+  padding: 260px 2rem 2rem 2rem;
+  color: black;
+  font: 1.3rem Inconsolata, monospace;
+  text-shadow: 0 0 5px #C8C8C8;
+  overflow-y: scroll;
+  word-wrap: break-word;
+  display: flex;
+  flex-direction: column;
+}
+
+#interactive_screen {
+
+}
+
+#list_screen {
+  margin-top: 50px;
+}
+
+.admin_screen_btn {
+  outline: none;
+  background: none;
+  font: 1.3rem Inconsolata, monospace;
+  text-shadow: 0 0 5px #C8C8C8;
+  color: black;
+  border-radius: 5px;
+  margin: 0.85em 0;
+  width: 150px;
+}
+
+::selection {
+  background: #0080FF;
+  text-shadow: none;
+}
+
+.terminal_input {
+  outline: none;
+  background: none;
+	border: none;
+  font: 1.3rem Inconsolata, monospace;
+  color: #696969;
+  border-bottom: 1px solid;
+  width: 400px;
+}
+
+.terminal_input_file {
+  outline: none;
+  background: none;
+	border: none;
+  font: 1.3rem Inconsolata, monospace;
+  margin: auto 0;
+}
+.input_file_span {
+  display: flex;
+  justify-content: flex-start;
+}
+.admin_news_textarea {
+  height: 200px;
+  resize: none;
+}
+
+.terminal_span {
+  font-weight: bold;
+  margin-left: 20px;
+}
+
+.interactive_button_container {
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+}
+
+.interactive_control_panel {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+  width: 50%;
+}
+
+.interactive_control_panel_row {
+  line-height: 2em;
+  display: grid;
+  grid-template-columns: 20% 80%;
+}
+
+input[type=checkbox]:checked + label{
+  color: red;
+}

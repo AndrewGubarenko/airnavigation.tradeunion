@@ -1,0 +1,21 @@
+.go_up_button {
+  position: fixed;
+  bottom: 1%;
+  right: 1%;
+  width: 70px;
+  opacity: 90%;
+  z-index: 25;
+}
+
+#goUp {
+  width: 70px;
+
+}
+
+.go_up_button:hover {
+  cursor: pointer;
+}
+
+#goUp:active {
+  transform: scale(0.95);
+}

@@ -1,0 +1,12 @@
+@import "./styles/main-page.css";
+@import "./styles/header.css";
+@import "./styles/footer.css";
+@import "./styles/authentication.css";
+@import "./styles/passwordActions.css";
+@import "./styles/singleNew.css";
+@import "./styles/adminPage.css";
+
+@font-face {
+font-family: "Jura";
+src: url("./fonts/Jura/Jura-VariableFont_wght.ttf") format("truetype");
+}
