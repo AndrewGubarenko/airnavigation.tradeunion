@@ -12,13 +12,15 @@ class HeaderContainer extends React.Component {
     super(props);
 
     this.state = {
-      adminLinkColor: "red"
+      adminLinkColor: "red",
+      isBurgerChecked: false
     };
   }
 
   showLoginForm = async () => {
     if(this.props.location.pathname === "/main") {
       await this.props.dispatch(setIsAuthContainerVisible("block"));
+      this.setState({isBurgerChecked: false});
       scroller.scrollTo("auth__container", {
         spy: true,
         smooth: true,
@@ -28,6 +30,7 @@ class HeaderContainer extends React.Component {
     } else {
       await this.props.history.push("/main");
       await this.props.dispatch(setIsAuthContainerVisible("block"));
+      this.setState({isBurgerChecked: false});
       scroller.scrollTo("auth__container", {
         spy: true,
         smooth: true,
@@ -39,6 +42,7 @@ class HeaderContainer extends React.Component {
 
   onClickToNews = async () => {
     if(this.props.location.pathname === "/main") {
+      this.setState({isBurgerChecked: false});
       scroller.scrollTo("news__container", {
         spy: true,
         smooth: true,
@@ -47,6 +51,7 @@ class HeaderContainer extends React.Component {
       });
     } else {
       await this.props.history.push("/main");
+      this.setState({isBurgerChecked: false});
       scroller.scrollTo("news__container", {
         spy: true,
         smooth: true,
@@ -58,6 +63,7 @@ class HeaderContainer extends React.Component {
 
   onClickToFiles = async () => {
     if(this.props.location.pathname === "/main") {
+      this.setState({isBurgerChecked: false});
       scroller.scrollTo("file__container", {
         spy: true,
         smooth: true,
@@ -66,6 +72,7 @@ class HeaderContainer extends React.Component {
       });
     } else {
       await this.props.history.push("/main");
+      this.setState({isBurgerChecked: false});
       scroller.scrollTo("file__container", {
         spy: true,
         smooth: true,
@@ -83,17 +90,20 @@ class HeaderContainer extends React.Component {
   }
 
   onClickToMain = () => {
+    this.setState({isBurgerChecked: false});
     this.props.history.push("/main");
   }
   onClickToAdmin = (event) => {
+    this.setState({isBurgerChecked: false});
     this.props.history.push("/admin");
   }
 
   logInOrLogOut = () => {
       if (this.props.isAuthenticated) {
         return(
-          <li className="menu-li"
+          <li className="menu-li burget_menu_li"
               onClick={() => {
+                this.setState({isBurgerChecked: false});
                 this.props.history.push("/main");
                 this.props.dispatch(setIsAuthenticated(false));
                 this.props.dispatch(setIsAuthContainerVisible("none"));
@@ -114,9 +124,18 @@ class HeaderContainer extends React.Component {
     this.props.history.push("/main");
   }
 
+  onBurgerClick = () => {
+    if(this.state.isBurgerChecked === false) {
+      this.setState({isBurgerChecked: true});
+    } else {
+      this.setState({isBurgerChecked: false});
+    }
+  }
+
   render() {
     return(
       <Header
+        isBurgerChecked={this.state.isBurgerChecked}
         adminLinkColor={this.state.adminLinkColor}
         onMouseEnter={this.onMouseEnter}
         onMouseLeave={this.onMouseLeave}
@@ -128,6 +147,7 @@ class HeaderContainer extends React.Component {
         onClickToAdmin={this.onClickToAdmin}
         adminDisplayMode={this.props.adminDisplayMode}
         toMainDisplayMode={this.props.toMainDisplayMode}
+        onBurgerClick={this.onBurgerClick}
         />
     );
   }

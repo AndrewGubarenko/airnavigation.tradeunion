@@ -159,20 +159,20 @@ class AdminPage extends React.Component {
 {/*files panels*/}
 {/*Files upload functions*/}
             <div className="interactive_control_panel" style={{display: this.props.XMLCountUodateControlPanelDisplay}}>
-              <div className="interactive_control_panel_row">
+              <div className="interactive_control_panel_file_upload">
                 <span/><span className="input_file_span" >Choose file to update accounts: </span>
               </div>
-              <div className="interactive_control_panel_row">
+              <div className="interactive_control_panel_file_upload">
                 <span/><input id="acounts_flie_input_key" className="terminal_input_file" type="file" name="file" onChange={this.props.onChangeUpdateCountFile} style={{color: this.props.fileInputColor}}/>
               </div>
               <button className="admin_screen_btn" onClick={this.props.onClickUploadCountFile}>Update</button>
             </div>
 
             <div className="interactive_control_panel" style={{display: this.props.XMLDatabaseUpdateControlPanelDisplay}}>
-              <div className="interactive_control_panel_row">
+              <div className="interactive_control_panel_file_upload">
                 <span/><span className="input_file_span" >Choose file to update DB: </span>
               </div>
-              <div className="interactive_control_panel_row">
+              <div className="interactive_control_panel_file_upload">
                 <span/><input id="db_flie_input_key" className="terminal_input_file" type="file" name="file" onChange={this.props.onChangeUpdateDatabaseFile} style={{color: this.props.fileInputColor}}/>
               </div>
               <button className="admin_screen_btn" onClick={this.props.onClickUploadDatabaseFile}>Update</button>

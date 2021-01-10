@@ -20,10 +20,11 @@ class UserData extends React.Component {
 
         <p className="container-name">Особисті дані</p>
         <div className="border-plane-container">
-          <hr className="standart-container-line"/>
-          <svg className="svg-plane-icon">
-            <use xlinkHref="#svg-plane"/>
-          </svg>
+          <div className="standart-container-line">
+            <svg className="svg-plane-icon">
+              <use xlinkHref="#svg-plane"/>
+            </svg>
+          </div>
         </div>
 
         <div className="user-container">
@@ -36,7 +37,7 @@ class UserData extends React.Component {
               <p id="user__name">{this.props.firstName} {this.props.lastName}</p>
               <p id="user__count">на Вашому рахунку:
                 <br/>
-                {this.props.count} грн
+                {this.props.count} грн.
               </p>
             </div>
             <Link id="password__change__button" to="/change_password">

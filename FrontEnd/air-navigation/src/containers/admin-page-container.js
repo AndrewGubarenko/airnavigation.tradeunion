@@ -438,7 +438,7 @@ class AdminPageContainer extends React.Component {
               {
                 list.map(item => {
                   return(
-                    <div style={{cursor: "pointer"}} onClick={async() => {
+                    <div className="admin_result_list_item" style={{cursor: "pointer"}} onClick={async() => {
                         await this.setState({user: item});
                         this.setState({selected: item.gender});
                         if(item.roles.includes("ADMINISTRATOR")) {
@@ -475,7 +475,7 @@ class AdminPageContainer extends React.Component {
               {
                 list.map(item => {
                   return(
-                    <div key={item.id} style={{cursor: "pointer"}} onClick={async() => {
+                    <div key={item.id} className="admin_result_list_item" style={{cursor: "pointer"}} onClick={async() => {
                         await this.setState({news: item});
                         this.setState({newsUpdateControlPanelDisplay: "block"});
                         this.setState({DeleteNewsButtonDisplay: "block"});
@@ -508,7 +508,7 @@ class AdminPageContainer extends React.Component {
               {
                 list.map(item => {
                   return(
-                    <div key={item.id} style={{cursor: "pointer"}} onClick={async() => {
+                    <div key={item.id} className="admin_result_list_item" style={{cursor: "pointer"}} onClick={async() => {
                         await this.setState({file: item});
                         this.setState({filesUpdateControlPanelDisplay: "block"});
                         this.setState({DeleteFileButtonDisplay: "block"});
@@ -541,7 +541,7 @@ class AdminPageContainer extends React.Component {
               {
                 list.map(item => {
                   return(
-                    <div>
+                    <div className="admin_result_list_item">
                       <pre>{++count}) {JSON.stringify(item)}</pre>
                     </div>
                   );

@@ -16,8 +16,8 @@ class MainPageContainer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      arrowNewsClassName: "arrow-4",
-      arrowFilesClassName: "arrow-4",
+      arrowNewsClassName: "expandArrow",
+      arrowFilesClassName: "expandArrow",
       newsArray: [],
       filesArray: []
     };
@@ -116,21 +116,21 @@ class MainPageContainer extends React.Component {
   }
 
   onClickExpandArrowNews = () => {
-    if (this.state.arrowNewsClassName === "arrow-4") {
+    if (this.state.arrowNewsClassName === "expandArrow") {
       this.expandNews();
-      this.setState({arrowNewsClassName: "arrow-4 open"});
-    } else if (this.state.arrowNewsClassName === "arrow-4 open") {
+      this.setState({arrowNewsClassName: "expandArrow open"});
+    } else if (this.state.arrowNewsClassName === "expandArrow open") {
       this.setNews();
-      this.setState({arrowNewsClassName: "arrow-4"});
+      this.setState({arrowNewsClassName: "expandArrow"});
     }
   }
 
   onClickExpandArrowFiles = () => {
-    if (this.state.arrowFilesClassName === "arrow-4") {
-      this.setState({arrowFilesClassName: "arrow-4 open"});
+    if (this.state.arrowFilesClassName === "expandArrow") {
+      this.setState({arrowFilesClassName: "expandArrow open"});
       this.expandFiles();
-    } else if (this.state.arrowFilesClassName === "arrow-4 open") {
-      this.setState({arrowFilesClassName: "arrow-4"});
+    } else if (this.state.arrowFilesClassName === "expandArrow open") {
+      this.setState({arrowFilesClassName: "expandArrow"});
       this.setFiles();
     }
   }

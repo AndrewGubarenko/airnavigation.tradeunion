@@ -27,10 +27,11 @@ class MainPage extends React.Component {
         <div id="news__container" className="standart-container">
           <p className="container-name">Новини</p>
           <div className="border-plane-container">
-            <hr className="standart-container-line"/>
-            <svg className="svg-plane-icon">
-              <use xlinkHref="#svg-plane"/>
-            </svg>
+            <div className="standart-container-line">
+              <svg className="svg-plane-icon">
+                <use xlinkHref="#svg-plane"/>
+              </svg>
+            </div>
           </div>
 
           <div className="news-grid-container">
@@ -39,8 +40,8 @@ class MainPage extends React.Component {
 
 
           <div className={this.props.arrowNewsClassName} onClick={this.props.onClickExpandArrowNews}>
-              <span className="arrow-4-left"></span>
-              <span className="arrow-4-right"></span>
+              <span className="expandArrow-left"></span>
+              <span className="expandArrow-right"></span>
           </div>
 
         </div>
@@ -48,10 +49,11 @@ class MainPage extends React.Component {
         <div id="file__container" className="standart-container">
           <p className="container-name">Файли</p>
           <div className="border-plane-container">
-            <hr className="standart-container-line"/>
-            <svg className="svg-plane-icon">
-              <use xlinkHref="#svg-plane"/>
-            </svg>
+            <div className="standart-container-line">
+              <svg className="svg-plane-icon">
+                <use xlinkHref="#svg-plane"/>
+              </svg>
+            </div>
           </div>
 
           <div className="news-grid-container">
@@ -59,8 +61,8 @@ class MainPage extends React.Component {
           </div>
 
           <div className={this.props.arrowFilesClassName} onClick={this.props.onClickExpandArrowFiles}>
-              <span className="arrow-4-left"></span>
-              <span className="arrow-4-right"></span>
+              <span className="expandArrow-left"></span>
+              <span className="expandArrow-right"></span>
           </div>
 
         </div>

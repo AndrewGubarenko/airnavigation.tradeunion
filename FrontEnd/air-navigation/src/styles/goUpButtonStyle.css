@@ -3,8 +3,8 @@
   bottom: 1%;
   right: 1%;
   width: 70px;
-  opacity: 90%;
   z-index: 25;
+  transition: opacity 1s ease-out;
 }
 
 #goUp {
@@ -18,4 +18,36 @@
 
 #goUp:active {
   transform: scale(0.95);
+}
+
+@media (max-width: 1199px) {
+
+}
+@media (max-width: 1023px) {
+
+}
+@media (max-width: 899px) {
+  .go_up_button {
+    width: 50px;
+  }
+  #goUp {
+    width: 50px;
+  }
+}
+@media (max-width: 649px) {
+
+}
+@media (max-width: 549px) {
+
+}
+@media (max-width: 349px) {
+
+}
+@media (max-width: 219px) {
+  .go_up_button {
+    width: 35px;
+  }
+  #goUp {
+    width: 35px;
+  }
 }

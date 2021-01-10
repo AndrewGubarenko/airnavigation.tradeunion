@@ -8,7 +8,8 @@ class GoUpButtonContainer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      displayGoUpButton: "none"
+      visibilityGoUpButton: "hidden",
+      opacityGoUpButton: 0
     };
   }
 
@@ -30,17 +31,19 @@ class GoUpButtonContainer extends React.Component {
   }
 
   onScrollGoUpButton = (event) => {
-    if (window.scrollY === 0 && this.state.displayGoUpButton === "block") {
-        this.setState({displayGoUpButton: "none"});
+    if (window.scrollY === 0 && this.state.visibilityGoUpButton === "visible") {
+        this.setState({visibilityGoUpButton: "hidden"});
+        this.setState({opacityGoUpButton: 0});
     }
-    else if (window.scrollY !== 0 && this.state.displayGoUpButton === "none") {
-        this.setState({displayGoUpButton: "block"});
+    else if (window.scrollY !== 0 && this.state.visibilityGoUpButton === "hidden") {
+        this.setState({visibilityGoUpButton: "visible"});
+        this.setState({opacityGoUpButton: "90%"});
     }
   }
 
   render() {
     return(
-      <div className="go_up_button" style={{display: this.state.displayGoUpButton}}>
+      <div className="go_up_button" style={{visibility: this.state.visibilityGoUpButton, opacity: this.state.opacityGoUpButton}}>
         <img  id="goUp"
               src={GO_UP_BUTTON}
               alt=""

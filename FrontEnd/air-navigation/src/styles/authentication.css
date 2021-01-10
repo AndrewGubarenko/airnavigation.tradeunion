@@ -91,3 +91,37 @@
   color: #09173f;
   font-weight: bold;
 }
+
+@media (max-width: 1199px) {
+
+}
+@media (max-width: 1023px) {
+
+}
+@media (max-width: 899px) {
+  .main-auth-container {
+    flex-direction: column;
+  }
+}
+@media (max-width: 649px) {
+
+}
+@media (max-width: 549px) {
+  .main-auth-container {
+    margin: auto 10%;
+  }
+}
+@media (max-width: 349px) {
+  .main-auth-container {
+    width: 90%;
+  }
+  #sing__up__btn {
+		width: 100px;
+	}
+  #close__btn {
+    font-size: 14px;
+  }
+}
+@media (max-width: 219px) {
+
+}

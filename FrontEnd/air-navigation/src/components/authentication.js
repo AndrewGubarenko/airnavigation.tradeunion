@@ -11,10 +11,11 @@ class Header extends React.Component {
 
           <p className="container-name">Особисті дані</p>
           <div className="border-plane-container">
-            <hr className="standart-container-line"/>
-            <svg className="svg-plane-icon">
-              <use xlinkHref="#svg-plane"/>
-            </svg>
+            <div className="standart-container-line">
+              <svg className="svg-plane-icon">
+                <use xlinkHref="#svg-plane"/>
+              </svg>
+            </div>
           </div>
 
           <div className="main-auth-container">
