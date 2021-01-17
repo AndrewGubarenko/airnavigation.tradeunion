@@ -6,8 +6,8 @@ class FileContainer extends React.Component {
   render() {
     return(
       <File
-        name={this.props.name}
-        path={this.props.path}
+        key={this.props.file.id}
+        file={this.props.file}
         />
     );
   }

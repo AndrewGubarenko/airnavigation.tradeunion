@@ -16,10 +16,17 @@ class AuthenticationContainer extends React.Component {
     this.state = {
       email: "",
       password: "",
+      rememberMe: false,
       borderColorEmail: "darkgrey",
       borderColorPassword: "darkgrey",
       message:""
     };
+  }
+
+  componentWillUnmount() {
+    this.setState({email: ""});
+    this.setState({password: ""});
+    this.setState({rememberMe: false});
   }
 
   onChangeEmail = (event) => {
@@ -32,6 +39,14 @@ class AuthenticationContainer extends React.Component {
     this.setState({password: event.target.value});
   }
 
+  onChangeRememberMe = (event) => {
+    if (!this.state.rememberMe) {
+      this.setState({rememberMe: true});
+    } else {
+      this.setState({rememberMe: false});
+    }
+  }
+
   onClickSignUp = async () => {
     if(this.state.email === "") {
       this.setState({borderColorEmail: "red"});
@@ -39,30 +54,31 @@ class AuthenticationContainer extends React.Component {
       this.setState({borderColorPassword: "red"});
     } else {
       this.props.dispatch(setSpinnerVisibility("inline-block"));
-      await userService.getUser(1)
-                      .then(response => {
-                        if(response.ok) {
-                          response.json().then(user => {
-                            if(user){
-                              this.props.dispatch(setIsAuthenticated(true, user));
-                              if(user.roles.includes("ADMINISTRATOR")) {
-                                this.props.dispatch(setAdminDisplayMode("block"));
-                              }
-                            }
-                            this.setState({email: ""});
-                            this.setState({password: ""});
-                          });
-                        } else {
-                          return response.text().then(message => {
-                            this.setState({message: message});
-                            this.setState({email: ""});
-                            this.setState({password: ""});
-                          })
-                        }
-                      });
-        this.props.dispatch(setSpinnerVisibility("none"));
-      }
+      let user_object = {username: this.state.email,
+                         password: this.state.password,
+                         remember_me: this.state.rememberMe}
+      await userService.authenticate(user_object).then(response => {
+        console.log(response)
+        if(response.redirected && response.ok) {
+          response.json().then(user => {
+            console.log(user)
+            if(user){
+              this.props.dispatch(setIsAuthenticated(true, user));
+              if(user.roles.includes("ADMINISTRATOR")) {
+                this.props.dispatch(setAdminDisplayMode("block"));
+              }
+            }
+          });
+        } else {
+          this.setState({message: "Неавдалося авторизуватися. Спробуйте ще."});
+          this.setState({email: ""});
+          this.setState({password: ""});
+          this.setState({rememberMe: false});
+        }
+      });
+      this.props.dispatch(setSpinnerVisibility("none"));
     }
+  }
 
   onClickClose = () => {
     this.props.dispatch(setIsAuthContainerVisible("none"));
@@ -75,6 +91,7 @@ class AuthenticationContainer extends React.Component {
         {...this.state}
         onChangeEmail={this.onChangeEmail}
         onChangePassword={this.onChangePassword}
+        onChangeRememberMe={this.onChangeRememberMe}
         onClickSignUp={this.onClickSignUp}
         isAuthVisible={this.props.isAuthVisible}
         onClickClose={this.onClickClose}

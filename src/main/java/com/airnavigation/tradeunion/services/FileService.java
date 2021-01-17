@@ -51,7 +51,7 @@ public class FileService {
             File fileForUpdate = fileForUpdateOpt.get();
             if(fileForUpdate.getId() != id) {
                 LOGGER.warn("METHOD CHANGE_FILE: Unauthorized access attemption! HTTP request was changed! The id in path variable and file id does not match!");
-                throw new IllegalAccessAttemtException("The attemption of illegal access to data!");
+                throw new IllegalAccessAttemtException("Спроба несанкціонованого доступу до даних!");
             }
             fileForUpdate.setName(updatedFile.getName());
             fileForUpdate.setPath(updatedFile.getPath());
@@ -66,6 +66,6 @@ public class FileService {
     @Transactional
     public String deleteFile(long id) {
         filesRepository.deleteById(id);
-        return "Deleted";
+        return "Файл успішно видалений";
     }
 }

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TemporaryPasswordGenerator {
 
-    public String generateTemporaryPassword() {
+    public String generateTemporaryPassword(int length) {
         PasswordGenerator gen = new PasswordGenerator();
         CharacterData lowerCaseChars = EnglishCharacterData.LowerCase;
         CharacterRule lowerCaseRule = new CharacterRule(lowerCaseChars);
@@ -36,7 +36,7 @@ public class TemporaryPasswordGenerator {
         CharacterRule splCharRule = new CharacterRule(specialChars);
         splCharRule.setNumberOfCharacters(2);
 
-        String password = gen.generatePassword(12, splCharRule, lowerCaseRule,
+        String password = gen.generatePassword(length, splCharRule, lowerCaseRule,
                 upperCaseRule, digitRule);
         return password;
     }

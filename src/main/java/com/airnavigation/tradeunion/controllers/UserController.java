@@ -24,8 +24,11 @@ public class UserController {
     }
 
     @GetMapping(path = "/{id}")
+    @ResponseBody
     public ResponseEntity<User> getUser (@PathVariable long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getUser(id));
+        User response = userService.getUser(id);
+        response.setPassword("");
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PutMapping(path = "/{id}/password")

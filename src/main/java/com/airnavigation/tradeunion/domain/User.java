@@ -1,6 +1,7 @@
 package com.airnavigation.tradeunion.domain;
 
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -40,7 +41,7 @@ public class User {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(name = "count", columnDefinition="Decimal(10,2) default '0.00'")
+    @Column(name = "count" , columnDefinition="Decimal(10,2) default '0.00'")
     private Double count;
 
     @NonNull

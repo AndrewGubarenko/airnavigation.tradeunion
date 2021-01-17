@@ -17,7 +17,6 @@
   bottom: 0;
   display: flex;
   flex-direction: column;
-  margin-bottom: 50px;
 }
 
 /* standart-container */
@@ -262,6 +261,9 @@
   .news-container {
     width: 100%;
   }
+  #news-theme {
+    font-size: 16px;
+  }
 }
 @media (max-width: 549px) {
   .user-container {
@@ -307,6 +309,18 @@
     height: 100px;
     width: 100px;
   }
+  .svg-plane-icon {
+    right: -0.5em;
+  }
+  #password__change__button, #password__change__button__img {
+    width: 150px;
+  }
+  #news-theme {
+    font-size: 14px;
+  }
+  .news-grid-container, .news-container {
+    margin-top: 10px;
+  }
 }
 
 @media (max-width: 219px) {
@@ -315,6 +329,9 @@
     width: 80px;
   }
   #password__change__button, #password__change__button__img {
-    width: 150px;
+    width: 100px;
+  }
+  #user__name, #user__count, #news-theme {
+    font-size: 12px;
   }
 }

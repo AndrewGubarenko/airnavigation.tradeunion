@@ -35,9 +35,9 @@ class Header extends React.Component {
         </div>
 
         <div className="navigation_burger_menu">
-          <input id="menu__toggle" type="checkbox" checked={this.props.isBurgerChecked} onClick={this.props.onBurgerClick}/>
-          <label className="menu__btn" for="menu__toggle">
-            <span></span>
+          <input id="menu__toggle" checked={this.props.isBurgerChecked} type="checkbox" onClick={this.props.onBurgerClick} readOnly={true}/>
+          <label className="menu__btn" htmlFor="menu__toggle">
+            <span/>
           </label>
 
             <ul className="menu__box">

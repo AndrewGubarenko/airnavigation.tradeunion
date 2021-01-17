@@ -7,6 +7,10 @@ import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -121,5 +125,32 @@ public class CustomSpringExceptionHandler extends ExceptionHandlerExceptionResol
                 .append("\n")
                 .append(ex.fillInStackTrace().getMessage())
                 .toString());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> onUsernameNotFoundException(UsernameNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StringBuilder()
+                .append("ОТ ХАЛЕПА! ")
+                .append(ex.fillInStackTrace().getMessage())
+                .toString());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> onInternalAuthenticationServiceException(InternalAuthenticationServiceException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new StringBuilder()
+                .append("ОТ ХАЛЕПА! ")
+                .append(ex.fillInStackTrace().getMessage())
+                .toString());
+    }
+    @ExceptionHandler
+    public ResponseEntity<String> onAuthenticationCredentialsNotFoundException(AuthenticationCredentialsNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringBuilder()
+                .append("ОТ ХАЛЕПА! ")
+                .append(ex.fillInStackTrace().getMessage())
+                .toString());
+    }
+    @ExceptionHandler
+    public ResponseEntity<String> onAccessDeniedException(AccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ОТ ХАЛЕПА! Доступ заборонено!");
     }
 }

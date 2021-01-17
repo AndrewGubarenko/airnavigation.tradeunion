@@ -9,6 +9,8 @@ import com.airnavigation.tradeunion.utilities.EmailServiceImpl;
 import com.airnavigation.tradeunion.utilities.TemporaryPasswordGenerator;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +37,7 @@ public class UserService implements UserServiceInterface {
 
     @Override
     @Transactional
+    @PreAuthorize("#id == authentication.principal.getId() and #changePassword.currentPassword == authentication.credentials")
     public String changePassword(ChangePassword changePassword, long id) {
         String response;
         Optional<User> userForUpdateOpt = userRepository.findById(id);
@@ -63,6 +66,8 @@ public class UserService implements UserServiceInterface {
 
     @Override
     @Transactional
+    @PreAuthorize("#id == authentication.principal.getId()")
+    @PostAuthorize("returnObject.username == authentication.principal.username")
     public User getUser(long id) {
         Optional<User> foundUserOpt = userRepository.findById(id);
         if(!foundUserOpt.isPresent()) {
@@ -78,12 +83,12 @@ public class UserService implements UserServiceInterface {
         StringBuilder response = new StringBuilder();
         if(foundUserOpt.isPresent()) {
             User user = foundUserOpt.get();
-            user.setPassword(passwordGenerator.generateTemporaryPassword());
+            user.setPassword(passwordGenerator.generateTemporaryPassword(15));
             userRepository.save(user);
             /*emailService.sendSimpleMessage(user.getUsername(),
                                             "Відновлення паролю",
                                             new StringBuilder().append("Вітаю! Ваш пароль на сайті профспілки Аеронавігація було перевстановлено.\n")
-                                                               .append("Ваш новийтимчасовий пароль для доступу до особистого кабінету: ")
+                                                               .append("Ваш новий тимчасовий пароль для доступу до особистого кабінету: ")
                                                                .append(user.getPassword())
                                                                .append("\n")
                                                                .append("Якщо ви не виконували цієї дії, негайно зверніться до адміністратора. \n")

@@ -5,7 +5,7 @@ import {Link} from 'react-router-dom';
 class News extends React.Component {
   render() {
     return(
-      <div className="news-container">
+      <div key={this.props.singleNew.id} className="news-container">
         <div id="news__icon">
           <img id="news__icon__img" src={NEWS_COOL} alt=""/>
         </div>

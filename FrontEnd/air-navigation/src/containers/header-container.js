@@ -5,6 +5,7 @@ import {setIsAuthenticated} from './../reducers/actions/userAction';
 import {setIsAuthContainerVisible} from './../reducers/actions/AuthContainerAction';
 import {setAdminDisplayMode} from './../reducers/actions/AdminAction'
 import {scroller} from 'react-scroll';
+import {userService} from './../app-context/context';
 
 class HeaderContainer extends React.Component {
 
@@ -76,7 +77,7 @@ class HeaderContainer extends React.Component {
       scroller.scrollTo("file__container", {
         spy: true,
         smooth: true,
-        offset:-70,
+        offset: 270,
         duration: 500
       });
     }
@@ -95,7 +96,7 @@ class HeaderContainer extends React.Component {
   }
   onClickToAdmin = (event) => {
     this.setState({isBurgerChecked: false});
-    this.props.history.push("/admin");
+    this.props.history.push("/administrator");
   }
 
   logInOrLogOut = () => {
@@ -103,16 +104,22 @@ class HeaderContainer extends React.Component {
         return(
           <li className="menu-li burget_menu_li"
               onClick={() => {
-                this.setState({isBurgerChecked: false});
-                this.props.history.push("/main");
-                this.props.dispatch(setIsAuthenticated(false));
-                this.props.dispatch(setIsAuthContainerVisible("none"));
-                this.props.dispatch(setAdminDisplayMode("none"));
+                userService.logout().then(response => {
+                  if(response.ok) {
+                    this.setState({isBurgerChecked: false});
+                    this.props.history.push("/main");
+                    this.props.dispatch(setIsAuthenticated(false, null));
+                    this.props.dispatch(setIsAuthContainerVisible("none"));
+                    this.props.dispatch(setAdminDisplayMode("none"));
+                  } else {
+                    alert("Something wrong!")
+                  }
+                })
               }}>Вийти</li>
         );
       } else {
         return(
-          <li className="menu-li">
+          <li className="menu-li burget_menu_li">
             <div key="logInDiv" onClick={this.showLoginForm}
             >Увійти</div>
           </li>

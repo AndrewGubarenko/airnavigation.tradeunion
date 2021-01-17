@@ -45,7 +45,7 @@ class MainPageContainer extends React.Component {
            />
       }
     } else {
-      shortNewsArray[0] = <p>Покищо немає новин..</p>
+      shortNewsArray[0] = <p key="zeroNews">Покищо немає новин..</p>
     }
     this.setState({newsArray: shortNewsArray});
   }
@@ -60,7 +60,7 @@ class MainPageContainer extends React.Component {
            />
       });
     } else {
-      longNewsArray[0] = <p>Покищо немає новин..</p>
+      longNewsArray[0] = <p key="zeroNews">Покищо немає новин..</p>
     }
     this.setState({newsArray: longNewsArray});
   }
@@ -71,12 +71,11 @@ class MainPageContainer extends React.Component {
       for (let i = 0; i < this.props.files.listOfFiles.length && i < 4; i++) {
         shortFilesArray[i] = <FileContainer
           key={this.props.files.listOfFiles[i].id}
-          name={this.props.files.listOfFiles[i].name}
-          path={this.props.files.listOfFiles[i].path}
+          file={this.props.files.listOfFiles[i]}
            />
       }
     } else {
-      shortFilesArray[0] = <p>Покищо немає файлів..</p>
+      shortFilesArray[0] = <p key="zeroFiles">Покищо немає файлів..</p>
     }
     this.setState({filesArray: shortFilesArray});
   }
@@ -87,12 +86,11 @@ class MainPageContainer extends React.Component {
       this.props.files.listOfFiles.forEach((file, i) => {
         longFilesArray[i] = <FileContainer
           key={file.id}
-          name={file.name}
-          path={file.path}
+          file={file}
            />
       });
     } else {
-      longFilesArray[0] = <p>Покищо немає файлів..</p>
+      longFilesArray[0] = <p key="zeroFiles">Покищо немає файлів..</p>
     }
     this.setState({filesArray: longFilesArray});
   }

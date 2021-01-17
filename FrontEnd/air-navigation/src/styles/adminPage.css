@@ -36,7 +36,7 @@
   width: 80%;
   padding: 260px 2rem 2rem 2rem;
   color: black;
-  font: 1.3rem Inconsolata, monospace;
+  font: 1.3rem "Inconsolata", monospace;
   text-shadow: 0 0 5px #C8C8C8;
   overflow-y: scroll;
   word-wrap: break-word;

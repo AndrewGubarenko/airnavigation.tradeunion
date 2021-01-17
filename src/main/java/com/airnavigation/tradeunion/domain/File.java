@@ -24,4 +24,8 @@ public class File {
 
     @Column(name = "PATH", nullable = false)
     String path;
+
+/*    @SuppressWarnings("SpellCheckingInspection")
+    @Column(name = "IS_ADOP", nullable = false)
+    Boolean isAdop;*/
 }

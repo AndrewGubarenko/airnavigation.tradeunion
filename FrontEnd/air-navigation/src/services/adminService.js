@@ -1,6 +1,6 @@
 export default class AdminService {
   constructor(startUrl) {
-    this.startUrl = startUrl + "admin";
+    this.startUrl = startUrl + "administrator";
   }
 
 /*user*/
@@ -36,10 +36,7 @@ export default class AdminService {
 
   deleteUser(id) {
     return fetch(this.startUrl + "/user/" + id, {
-      method: "delete",
-      headers: new Headers({
-        "Content-type": "application/json;chartSet=UTF-8"
-      })
+      method: "delete"
     });
   }
 /*user*/
@@ -66,10 +63,7 @@ export default class AdminService {
 
   deleteNews(id){
     return fetch(this.startUrl + "/news/" + id, {
-      method: "delete",
-      headers: new Headers({
-        "Content-type": "application/json;chartSet=UTF-8"
-      })
+      method: "delete"
     });
   }
   /*news*/
@@ -96,38 +90,26 @@ export default class AdminService {
 
   deleteFile(id){
     return fetch(this.startUrl + "/file/" + id, {
-      method: "delete",
-      headers: new Headers({
-        "Content-type": "application/json;chartSet=UTF-8"
-      })
+      method: "delete"
     });
   }
   /*files*/
   /*Lists*/
   getListOfUsers(){
     return fetch(this.startUrl + "/users_list", {
-      method: "get",
-      headers: new Headers({
-        "Content-type": "application/json;chartSet=UTF-8"
-      })
+      method: "get"
     });
   }
 
   getListOfNews(){
     return fetch(this.startUrl + "/news_list", {
-      method: "get",
-      headers: new Headers({
-        "Content-type": "application/json;chartSet=UTF-8"
-      })
+      method: "get"
     });
   }
 
   getListOfFiles(){
     return fetch(this.startUrl + "/files_list", {
-      method: "get",
-      headers: new Headers({
-        "Content-type": "application/json;chartSet=UTF-8"
-      })
+      method: "get"
     });
   }
   /*Lists*/

@@ -59,7 +59,9 @@ class ChangePasswordContainer extends React.Component {
       this.setState({borderColorNewPass: "red"});
     } else {
       this.props.dispatch(setSpinnerVisibility("inline-block"));
-      await userService.changePassword(this.state.passData, this.props.user.id).then(response => {
+      let correctPassData = {currentPassword: this.state.passData.currentPassword,
+                             newPassword: this.state.passData.newPassword}
+      await userService.changePassword(correctPassData, this.props.user.id).then(response => {
         response.text().then(message => {
           this.setState({message: message});
           const passData = this.state.passData;
@@ -70,6 +72,7 @@ class ChangePasswordContainer extends React.Component {
         });
       })
       this.props.dispatch(setSpinnerVisibility("none"));
+      
     }
   }
 

@@ -10,3 +10,8 @@
 font-family: "Jura";
 src: url("./fonts/Jura/Jura-VariableFont_wght.ttf") format("truetype");
 }
+
+@font-face {
+font-family: "Inconsolata";
+src: url("./fonts/Inconsolata/Inconsolata-VariableFont_wdth,wght.ttf") format("truetype");
+}

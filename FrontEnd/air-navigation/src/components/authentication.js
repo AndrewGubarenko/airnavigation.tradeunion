@@ -30,7 +30,7 @@ class Header extends React.Component {
               <div>
                 <label id="forgot_password">
                   <span className="inscription" id="forgot_password_span">
-                    <text>Забули пароль? </text>
+                    <span>Забули пароль? </span>
                     <Link id="forgot_password_link" to="/restore_password">Тисніть сюди!</Link>
                   </span>
                 </label>
@@ -46,7 +46,7 @@ class Header extends React.Component {
               </label>
               <div>
                 <label id="checkbox">
-                  <input id="checkbox__input" type="checkbox" name="remember_me"/>
+                  <input id="checkbox__input" type="checkbox" name="remember_me" checked={this.props.rememberMe} onChange={this.props.onChangeRememberMe}/>
                   <span className="inscription" id="checkbox__span">Запам'ятати мене</span>
                 </label>
               </div>

@@ -438,7 +438,7 @@ class AdminPageContainer extends React.Component {
               {
                 list.map(item => {
                   return(
-                    <div className="admin_result_list_item" style={{cursor: "pointer"}} onClick={async() => {
+                    <div key={item.id} className="admin_result_list_item" style={{cursor: "pointer"}} onClick={async() => {
                         await this.setState({user: item});
                         this.setState({selected: item.gender});
                         if(item.roles.includes("ADMINISTRATOR")) {
@@ -541,7 +541,7 @@ class AdminPageContainer extends React.Component {
               {
                 list.map(item => {
                   return(
-                    <div className="admin_result_list_item">
+                    <div key={count} className="admin_result_list_item">
                       <pre>{++count}) {JSON.stringify(item)}</pre>
                     </div>
                   );
@@ -614,7 +614,12 @@ class AdminPageContainer extends React.Component {
       return response.json()
     }).then(data => {
       this.createLogsListForPrint(data);
-    });
+    }).then(() => {scroller.scrollTo("footer", {
+                                                  spy: true,
+                                                  smooth: true,
+                                                  offset:-300,
+                                                  duration: 500
+                                                });});
     this.props.dispatch(setSpinnerVisibility("none"));
   }
 /*Menu functions*/

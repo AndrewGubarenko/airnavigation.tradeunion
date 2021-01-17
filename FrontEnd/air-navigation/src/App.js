@@ -27,7 +27,7 @@ class App extends Component {
             <Route path="/change_password" component={ChangePasswordContainer} />
             <Route path="/restore_password" component={RestorePasswordContainer} />
             <Route path="/news/:id" component={SingleNewContainer} />
-            <Route path="/admin" component={AdminPageContainer} />
+            <Route path="/administrator" component={AdminPageContainer} />
             <Route path="/" component={Footer} />
           </BrowserRouter>
         </PersistGate>

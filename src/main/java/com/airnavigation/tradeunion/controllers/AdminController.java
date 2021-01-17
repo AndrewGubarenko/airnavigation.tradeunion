@@ -22,7 +22,7 @@ import java.util.Set;
  * Controller for administrator
  */
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/administrator")
 public class AdminController {
 
     private final AdminServiceInterface adminService;
@@ -45,12 +45,14 @@ public class AdminController {
     @PutMapping(path = "/data_base", consumes = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     public ResponseEntity<Set<User>> updateDatabaseXLSX (@RequestBody byte[] file) throws IOException {
         Set<User> response = adminService.updateDB(file, "xlsx");
+        response.forEach(user -> user.setPassword(""));
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PutMapping(path = "/data_base", consumes = "application/vnd.ms-excel")
     public ResponseEntity<Set<User>> updateDatabaseXLS (@RequestBody byte[] file) throws IOException {
         Set<User> response = adminService.updateDB(file, "xls");
+        response.forEach(user -> user.setPassword(""));
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -77,24 +79,28 @@ public class AdminController {
     @PostMapping(path = "/user")
     public ResponseEntity<User> createUser(@RequestBody User user) {
         User response = adminService.createUser(user);
+        response.setPassword("");
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping(path = "/users_list")
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> response = adminService.getListOfUsers();
+        response.forEach(user -> user.setPassword(""));
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping(path = "/user/filter")
     public ResponseEntity<List<User>> getUser(@RequestBody SearchRequest request) {
-        List<User> result = adminService.findUser(request);
-        return ResponseEntity.status(HttpStatus.OK).body(result);
+        List<User> response = adminService.findUser(request);
+        response.forEach(user -> user.setPassword(""));
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PutMapping(path = "/user/{id}")
     public ResponseEntity<User> updateUser(@PathVariable long id, @RequestBody User user) {
         User response = adminService.updateUser(id, user);
+        response.setPassword("");
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

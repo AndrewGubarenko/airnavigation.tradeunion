@@ -7,20 +7,38 @@ export default class UserService {
     return fetch(this.startUrl + "/" + id, {
       method: "get",
       headers: new Headers({
-        "Content-type": "application/json;chartSet=UTF-8"
+        "Content-type": "application/json;chartSet=UTF-8",
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
+        "Access-Control-Allow-Headers": "X-Custom-Header"
 	    })
     });
   }
 
   /*security*/
-  authenticate(authData) {
-    return fetch(this.startUrl + "/authentication", {
+  authenticate(user_object) {
+    return fetch(this.startUrl
+      + "/authentication?username="
+      + user_object.username
+      + "&password="
+      + user_object.password
+      + "&remember_me="
+      + user_object.remember_me, {
       method: "post",
-      body: JSON.stringify(authData),
+
       headers: new Headers({
-        "Content-type": "application/json;chartSet=UTF-8"
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
+        "Access-Control-Allow-Headers": "X-Custom-Header",
+        "Content-Type": "application/json;charset=utf-8"
       })
     });
+  }
+
+  logout() {
+    return fetch(this.startUrl + "/logout", {
+      method: "get"
+    })
   }
 
   changePassword(passData, id) {

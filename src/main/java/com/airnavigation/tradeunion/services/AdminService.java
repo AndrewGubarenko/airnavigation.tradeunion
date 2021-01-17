@@ -2,6 +2,7 @@
 package com.airnavigation.tradeunion.services;
 
 import com.airnavigation.tradeunion.Repositories.AdminRepository;
+import com.airnavigation.tradeunion.domain.Gender;
 import com.airnavigation.tradeunion.domain.PlainDomain.SearchRequest;
 import com.airnavigation.tradeunion.domain.Role;
 import com.airnavigation.tradeunion.domain.User;
@@ -13,6 +14,9 @@ import com.airnavigation.tradeunion.utilities.FileProcessor;
 import com.airnavigation.tradeunion.utilities.TemporaryPasswordGenerator;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +27,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 @Service
+@PreAuthorize("hasRole('ADMINISTRATOR')")
 public class AdminService implements AdminServiceInterface {
 
     private static final Logger LOGGER = Logger.getLogger(AdminService.class);
@@ -46,24 +51,35 @@ public class AdminService implements AdminServiceInterface {
     @Override
     @Transactional
     public User createUser(User user) {
+        String accessLevel;
         if(user.getUsername() == null
                 || user.getUsername().trim().isEmpty()) {
             LOGGER.warn("METHOD CREATE: The username field is empty!");
             throw new EmptyDataFieldsException("Поле email - порожнє!");
         }
         user.setUsername(user.getUsername().trim());
-        user.setPassword(passwordGenerator.generateTemporaryPassword());
         user.setFirstName(user.getFirstName().trim());
         user.setLastName(user.getLastName().trim());
         if (user.getCount() == null) {
             user.setCount(0.00);
         }
+        if (user.getGender() == null) {
+            user.setGender(Gender.MALE);
+        }
         if(user.getRoles() == null || user.getRoles().isEmpty()) {
             user.setRoles(new HashSet<>(Arrays.asList(Role.USER)));
+            user.setPassword(passwordGenerator.generateTemporaryPassword(15));
+            accessLevel = Role.USER.name();
+        } else if(user.getRoles().contains(Role.ADMINISTRATOR)) {
+            user.setPassword(passwordGenerator.generateTemporaryPassword(30));
+            accessLevel = Role.ADMINISTRATOR.name();
         } else {
             user.getRoles().add(Role.USER);
+            accessLevel = Role.USER.name();
+            user.setPassword(passwordGenerator.generateTemporaryPassword(15));
         }
         adminRepository.save(user);
+        //TODO: Enable this module before production
         /*emailService.sendSimpleMessage(user.getUsername(),
                                         "Реєстрація користувача",
                                         new StringBuilder().append("Вітаю! Вас зареєстровано на сайті профспілки Аеронавігація.\n")
@@ -74,7 +90,7 @@ public class AdminService implements AdminServiceInterface {
                                                            .append("Також радимо використовувати надійні паролі, наприклад ті, що генеруються Google.")
                                                            .append("Увага! Цей лист згенеровано автоматично. Не відповідайте на нього.")
                                                 .toString());*/
-        LOGGER.info("METHOD CREATE: User with username " + user.getUsername() + " was created");
+        LOGGER.info("METHOD CREATE: User with username: " + user.getUsername() + " and access level:" + accessLevel + " was created");
         return user;
     }
 
@@ -94,7 +110,6 @@ public class AdminService implements AdminServiceInterface {
             LOGGER.info("METHOD CREATE: User with username " + createdUser.getUsername() + " was successfully created");
             result.add(createdUser);
         });
-
         return result;
     }
 
@@ -190,8 +205,32 @@ public class AdminService implements AdminServiceInterface {
         userForUpdate.setLastName(updatedUser.getLastName().trim());
         userForUpdate.setGender(updatedUser.getGender());
         userForUpdate.setCount(updatedUser.getCount());
-        userForUpdate.setRoles(updatedUser.getRoles());
-        adminRepository.save(userForUpdate);
+
+        if(!userForUpdate.getRoles().contains(Role.ADMINISTRATOR) && updatedUser.getRoles().contains(Role.ADMINISTRATOR)) {
+            userForUpdate.setRoles(updatedUser.getRoles());
+            userForUpdate.setPassword(passwordGenerator.generateTemporaryPassword(30));
+            adminRepository.save(userForUpdate);
+            /*emailService.sendSimpleMessage(user.getUsername(),
+                                            "Встановлення рівня доступу Адміністратор",
+                                            new StringBuilder().append("Ваш рівень доступу на сайті профспілки Аеронавігація було підвищено до рівня Адміністратор.\n")
+                                                               .append("Ваш пароль на сайті профспілки Аеронавігація було перевстановлено.\n")
+                                                               .append("Ваш новий пароль для доступу до особистого кабінету: ")
+                                                               .append(userForUpdate.getPassword())
+                                                               .append("\n")
+                                                               .append("Увага! Цей лист згенеровано автоматично. Не відповідайте на нього.")
+                                                    .toString());*/
+        } else if(userForUpdate.getRoles().contains(Role.ADMINISTRATOR) && !updatedUser.getRoles().contains(Role.ADMINISTRATOR)) {
+            userForUpdate.setRoles(updatedUser.getRoles());
+        } else {
+            userForUpdate.setRoles(updatedUser.getRoles());
+            adminRepository.save(userForUpdate);
+            /*emailService.sendSimpleMessage(user.getUsername(),
+                                            "Встановлення рівня доступу Адміністратор",
+                                            new StringBuilder().append("Ваш рівень доступу на сайті профспілки Аеронавігація було знижено до рівня Користувач.\n")
+                                                               .append("\n")
+                                                               .append("Увага! Цей лист згенеровано автоматично. Не відповідайте на нього.")
+                                                    .toString());*/
+        }
         LOGGER.info("METHOD UPDATE: User with username " + updatedUser.getUsername() + " was updated");
         return userForUpdate;
     }
