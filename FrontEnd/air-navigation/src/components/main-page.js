@@ -46,26 +46,7 @@ class MainPage extends React.Component {
 
         </div>
 
-        <div id="file__container" className="standart-container">
-          <p className="container-name">Файли</p>
-          <div className="border-plane-container">
-            <div className="standart-container-line">
-              <svg className="svg-plane-icon">
-                <use xlinkHref="#svg-plane"/>
-              </svg>
-            </div>
-          </div>
-
-          <div className="news-grid-container">
-            {this.props.files}
-          </div>
-
-          <div className={this.props.arrowFilesClassName} onClick={this.props.onClickExpandArrowFiles}>
-              <span className="expandArrow-left"></span>
-              <span className="expandArrow-right"></span>
-          </div>
-
-        </div>
+        {this.props.FilesContainer()}
 
       </div>
     );

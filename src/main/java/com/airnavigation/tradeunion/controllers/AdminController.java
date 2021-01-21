@@ -1,5 +1,6 @@
 package com.airnavigation.tradeunion.controllers;
 
+import com.airnavigation.tradeunion.domain.Category;
 import com.airnavigation.tradeunion.domain.File;
 import com.airnavigation.tradeunion.domain.News;
 import com.airnavigation.tradeunion.domain.PlainDomain.SearchRequest;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -141,6 +143,28 @@ public class AdminController {
     @DeleteMapping(path = "/file/{id}")
     public ResponseEntity<String> deleteFile(@PathVariable long id) {
         String response = fileService.deleteFile(id);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    /**
+     * Categories section
+     */
+
+    @GetMapping(path = "/category_list")
+    public ResponseEntity<List<Category>> getCategoryList() {
+        List<Category> response = fileService.getCategoryList();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PutMapping(path = "/category")
+    public ResponseEntity<Category> updateCategory(@RequestBody Map<String, String> categoryNames) {
+        Category response = fileService.updateCategoryName(categoryNames);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @DeleteMapping(path = "/category/{name}")
+    public ResponseEntity<String> deleteCategory(@PathVariable String name) {
+        String response = fileService.deleteCategory(name);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

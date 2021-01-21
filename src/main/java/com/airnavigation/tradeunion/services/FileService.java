@@ -1,31 +1,42 @@
 package com.airnavigation.tradeunion.services;
 
+import com.airnavigation.tradeunion.Repositories.CategoryRepository;
 import com.airnavigation.tradeunion.Repositories.FilesRepository;
+import com.airnavigation.tradeunion.domain.Category;
 import com.airnavigation.tradeunion.domain.File;
 import com.airnavigation.tradeunion.exceptions.IllegalAccessAttemtException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
+@PreAuthorize("isAuthenticated()")
 public class FileService {
 
     private static final Logger LOGGER = Logger.getLogger(FileService.class);
 
     private final FilesRepository filesRepository;
+    private final CategoryRepository categoryRepository;
 
     @Autowired
-    public FileService(FilesRepository filesRepository) {
+    public FileService(FilesRepository filesRepository,
+                       CategoryRepository categoryRepository) {
         this.filesRepository = filesRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
     public File addFile(File file) {
+        Category category = this.createCategoryOrReturnActual(file.getCategory().getName());
+        file.setCategory(category);
         return filesRepository.save(file);
     }
 
@@ -45,6 +56,7 @@ public class FileService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
     public File changeFile(File updatedFile, long id) {
         Optional<File> fileForUpdateOpt = filesRepository.findById(id);
         if (fileForUpdateOpt.isPresent()) {
@@ -55,6 +67,7 @@ public class FileService {
             }
             fileForUpdate.setName(updatedFile.getName());
             fileForUpdate.setPath(updatedFile.getPath());
+            fileForUpdate.setCategory(this.createCategoryOrReturnActual(updatedFile.getCategory().getName()));
             filesRepository.save(fileForUpdate);
             return updatedFile;
         } else {
@@ -64,8 +77,78 @@ public class FileService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
     public String deleteFile(long id) {
-        filesRepository.deleteById(id);
-        return "Файл успішно видалений";
+        Optional<File> fileForRemoveOpt = filesRepository.findById(id);
+        if(fileForRemoveOpt.isPresent()) {
+            File fileForRemove = fileForRemoveOpt.get();
+            fileForRemove.removeCategory();
+            filesRepository.delete(fileForRemove);
+            return "Файл успішно видалений";
+        }
+        return "Щось пішло не так!";
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
+    Category createCategoryOrReturnActual(String categoryName) {
+        Optional<Category> categoryOpt = categoryRepository.findByName(categoryName.trim().toUpperCase());
+        if(categoryOpt.isPresent()) {
+            return categoryOpt.get();
+        } else {
+            Category category = new Category();
+            category.setName(categoryName.trim().toUpperCase());
+            LOGGER.info("Category " + categoryName + " has been created");
+            return categoryRepository.save(category);
+        }
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
+    public List<Category> getCategoryList() {
+        return categoryRepository.findAll();
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
+    public Category updateCategoryName(Map<String, String> categoryNames) {
+        String oldCategoryName = categoryNames.get("oldCategoryName");
+        String newCategoryName = categoryNames.get("newCategoryName");
+        StringBuilder loggerResponse = new StringBuilder();
+        Optional<Category> resultOpt = categoryRepository.findByName(oldCategoryName.trim().toUpperCase());
+        if(resultOpt.isPresent()) {
+            Category category = resultOpt.get();
+            category.setName(newCategoryName.trim().toUpperCase());
+            categoryRepository.save(category);
+            loggerResponse.append("Category ")
+                    .append(oldCategoryName)
+                    .append(" has been changed to ")
+                    .append(newCategoryName)
+                    .append(".");
+            LOGGER.info(loggerResponse);
+            return category;
+        } else {
+            loggerResponse.append("Category ")
+                    .append(oldCategoryName)
+                    .append(" was not found.");
+            LOGGER.warn(loggerResponse);
+            throw new NoSuchElementException(loggerResponse.toString());
+        }
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
+    public String deleteCategory(String categoryName) {
+        Optional<Category> resultOpt = categoryRepository.findByName(categoryName.trim().toUpperCase());
+        Category result;
+        if(resultOpt.isPresent()) {
+            result = resultOpt.get();
+        } else {
+            LOGGER.warn("Category " + categoryName + " was not found.");
+            throw new NoSuchElementException("Category " + categoryName + " was not found.");
+        }
+        result.getFiles().forEach(file -> this.deleteFile(file.getId()));
+        categoryRepository.delete(result);
+        return "Category " + categoryName + " was successfully removed with all connected files.";
     }
 }

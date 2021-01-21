@@ -1,9 +1,10 @@
 const SET_FILES = "SET_FILES";
 
-const setFiles = (listOfFiles) => {
+const setFiles = (listOfFiles, filesVisibility) => {
   let action = {
     type: SET_FILES,
-    listOfFiles: listOfFiles
+    listOfFiles: listOfFiles,
+    filesVisibility: filesVisibility
   };
   return action;
 };

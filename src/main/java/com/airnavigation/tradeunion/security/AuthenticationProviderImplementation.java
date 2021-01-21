@@ -7,6 +7,7 @@ import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -22,8 +23,7 @@ public class AuthenticationProviderImplementation implements AuthenticationProvi
     @Autowired
     public AuthenticationProviderImplementation(UserDetailsServiceImplementation userService) {
         this.userService = userService;
-        this.passwordEncoder = NoOpPasswordEncoder.getInstance();
-
+        this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
     @Override

@@ -6,10 +6,7 @@ import com.airnavigation.tradeunion.services.interfaces.UserServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author Andrii Hubarenko
@@ -29,10 +26,18 @@ public class RepresentationController {
     }
 
     @GetMapping(path = "/main")
-    public ResponseEntity<RepresentationContainer> getFiles() {
-        RepresentationContainer result = service.createRepresentation();
+    public ResponseEntity<RepresentationContainer> getRepresentation() {
+        RepresentationContainer result = service.createOpenRepresentation();
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
+
+    @GetMapping(path = "/full_main/{id}")
+    public ResponseEntity<RepresentationContainer> getRepresentation(@PathVariable long id) {
+        RepresentationContainer result = service.createRestrictRepresentation(id);
+        result.getAuthorizedUser().setPassword("");
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
     @PutMapping(path = "/password")
     public ResponseEntity<String> resetPassword(@RequestBody String email) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.resetPassword(email));

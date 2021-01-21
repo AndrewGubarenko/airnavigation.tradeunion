@@ -11,6 +11,8 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,14 +27,17 @@ public class UserService implements UserServiceInterface {
     private final UserRepository userRepository;
     private final TemporaryPasswordGenerator passwordGenerator;
     private final EmailServiceImpl emailService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserService (UserRepository userRepository,
                         TemporaryPasswordGenerator passwordGenerator,
-                        EmailServiceImpl emailService) {
+                        EmailServiceImpl emailService,
+                        BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordGenerator = passwordGenerator;
         this.emailService = emailService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -52,12 +57,12 @@ public class UserService implements UserServiceInterface {
         } else if(changePassword.getCurrentPassword() == null || changePassword.getCurrentPassword().trim().isEmpty()) {
             LOGGER.warn("METHOD CHANGE_PASSWORD: Current password field is empty");
             throw new EmptyDataFieldsException("ОТ ХАЛЕПА! Поле Поточний пароль порожнє");
-        } else if(!userForUpdateOpt.get().getPassword().equals(changePassword.getCurrentPassword())) {
+        } else if(passwordEncoder.encode(changePassword.getCurrentPassword()) == userForUpdateOpt.get().getPassword()) {
             LOGGER.warn("METHOD CHANGE_PASSWORD: Wrong current password");
             throw new EmptyDataFieldsException("Неправильний поточний пароль");
         } else {
             User userForUpdate = userForUpdateOpt.get();
-            userForUpdate.setPassword(changePassword.getNewPassword());
+            userForUpdate.setPassword(passwordEncoder.encode(changePassword.getNewPassword()));
             userRepository.save(userForUpdate);
             response = "УСПІШНО! Пароль було успішно змінено!";
             return response;
@@ -83,7 +88,7 @@ public class UserService implements UserServiceInterface {
         StringBuilder response = new StringBuilder();
         if(foundUserOpt.isPresent()) {
             User user = foundUserOpt.get();
-            user.setPassword(passwordGenerator.generateTemporaryPassword(15));
+            user.setPassword(passwordEncoder.encode(passwordGenerator.generateTemporaryPassword(15)));
             userRepository.save(user);
             /*emailService.sendSimpleMessage(user.getUsername(),
                                             "Відновлення паролю",

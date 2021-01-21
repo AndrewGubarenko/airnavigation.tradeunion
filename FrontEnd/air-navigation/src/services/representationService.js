@@ -3,8 +3,17 @@ export default class RepresentationService {
     this.startUrl = startUrl;
   }
 
-  get() {
+  getTruncatedMain() {
     return fetch(this.startUrl + "main", {
+      method: "get",
+      headers: new Headers({
+        "Content-type": "application/json;chartSet=UTF-8"
+	    })
+    });
+  }
+
+  getFullMain(id) {
+    return fetch(this.startUrl + "full_main/" + id, {
       method: "get",
       headers: new Headers({
         "Content-type": "application/json;chartSet=UTF-8"

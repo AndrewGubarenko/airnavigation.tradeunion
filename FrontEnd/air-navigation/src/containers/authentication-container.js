@@ -6,6 +6,8 @@ import {setAdminDisplayMode} from './../reducers/actions/AdminAction';
 import {setIsAuthContainerVisible} from './../reducers/actions/AuthContainerAction';
 import {animateScroll} from 'react-scroll';
 import {userService} from './../app-context/context';
+import {setNews} from './../reducers/actions/newsAction';
+import {setFiles} from './../reducers/actions/fileAction';
 import {setSpinnerVisibility} from './../reducers/actions/spinnerAction';
 
 class AuthenticationContainer extends React.Component {
@@ -58,19 +60,17 @@ class AuthenticationContainer extends React.Component {
                          password: this.state.password,
                          remember_me: this.state.rememberMe}
       await userService.authenticate(user_object).then(response => {
-        console.log(response)
         if(response.redirected && response.ok) {
-          response.json().then(user => {
-            console.log(user)
-            if(user){
-              this.props.dispatch(setIsAuthenticated(true, user));
-              if(user.roles.includes("ADMINISTRATOR")) {
-                this.props.dispatch(setAdminDisplayMode("block"));
-              }
+          response.json().then(representation => {
+            this.props.dispatch(setNews(representation.newsList));
+            this.props.dispatch(setFiles(representation.fileList, "block"));
+            this.props.dispatch(setIsAuthenticated(true, representation.authorizedUser));
+            if(representation.authorizedUser.roles.includes("ADMINISTRATOR")) {
+              this.props.dispatch(setAdminDisplayMode("block"));
             }
           });
         } else {
-          this.setState({message: "Неавдалося авторизуватися. Спробуйте ще."});
+          this.setState({message: "Не вдалося авторизуватися. Спробуйте ще."});
           this.setState({email: ""});
           this.setState({password: ""});
           this.setState({rememberMe: false});
@@ -105,6 +105,8 @@ class AuthenticationContainer extends React.Component {
 
 const mapStateToProps = (state) => {
   return Object.assign({}, state, {
+    news: state.news,
+    files: state.files,
     user: state.user,
     isAuthenticated: state.user.isAuthenticated,
     isAuthVisible: state.authContainer.isAuthVisible,

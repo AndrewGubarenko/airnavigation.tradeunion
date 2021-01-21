@@ -23,7 +23,7 @@ class Header extends React.Component {
               >Новини</div>
             </li>
             <li className="menu-li">
-              <div key="filesDiv" onClick={this.props.onClickToFiles}
+              <div key="filesDiv" style={{display: this.props.isDocsVisible}} onClick={this.props.onClickToFiles}
               >Документи</div>
             </li>
             {this.props.logInOrLogOut()}

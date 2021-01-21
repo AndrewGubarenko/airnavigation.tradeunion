@@ -15,8 +15,8 @@ import com.airnavigation.tradeunion.utilities.TemporaryPasswordGenerator;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,16 +36,20 @@ public class AdminService implements AdminServiceInterface {
     private final FileProcessor fileProcessor;
     private final TemporaryPasswordGenerator passwordGenerator;
     private final EmailServiceImpl emailService;
+    private final PasswordEncoder passwordEncoder;
+
 
     @Autowired
     public AdminService (AdminRepository adminRepository,
                          FileProcessor fileProcessor,
                          TemporaryPasswordGenerator passwordGenerator,
-                         EmailServiceImpl emailService) {
+                         EmailServiceImpl emailService,
+                         BCryptPasswordEncoder passwordEncoder) {
         this.adminRepository = adminRepository;
         this.fileProcessor = fileProcessor;
         this.passwordGenerator = passwordGenerator;
         this.emailService = emailService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -68,15 +72,21 @@ public class AdminService implements AdminServiceInterface {
         }
         if(user.getRoles() == null || user.getRoles().isEmpty()) {
             user.setRoles(new HashSet<>(Arrays.asList(Role.USER)));
-            user.setPassword(passwordGenerator.generateTemporaryPassword(15));
+            user.setPassword(passwordEncoder.encode(passwordGenerator.generateTemporaryPassword(15)));
+            //TODO: remove this line
+            System.out.println(user.getPassword());
             accessLevel = Role.USER.name();
         } else if(user.getRoles().contains(Role.ADMINISTRATOR)) {
-            user.setPassword(passwordGenerator.generateTemporaryPassword(30));
+            user.setPassword(passwordEncoder.encode(passwordGenerator.generateTemporaryPassword(30)));
+            //TODO: remove this line
+            System.out.println(user.getPassword());
             accessLevel = Role.ADMINISTRATOR.name();
         } else {
             user.getRoles().add(Role.USER);
             accessLevel = Role.USER.name();
-            user.setPassword(passwordGenerator.generateTemporaryPassword(15));
+            user.setPassword(passwordEncoder.encode(passwordGenerator.generateTemporaryPassword(15)));
+            //TODO: remove this line
+            System.out.println(user.getPassword());
         }
         adminRepository.save(user);
         //TODO: Enable this module before production
@@ -208,7 +218,7 @@ public class AdminService implements AdminServiceInterface {
 
         if(!userForUpdate.getRoles().contains(Role.ADMINISTRATOR) && updatedUser.getRoles().contains(Role.ADMINISTRATOR)) {
             userForUpdate.setRoles(updatedUser.getRoles());
-            userForUpdate.setPassword(passwordGenerator.generateTemporaryPassword(30));
+            userForUpdate.setPassword(passwordEncoder.encode(passwordGenerator.generateTemporaryPassword(30)));
             adminRepository.save(userForUpdate);
             /*emailService.sendSimpleMessage(user.getUsername(),
                                             "Встановлення рівня доступу Адміністратор",

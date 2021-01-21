@@ -3,7 +3,8 @@ import Header from './../components/header';
 import {connect} from 'react-redux';
 import {setIsAuthenticated} from './../reducers/actions/userAction';
 import {setIsAuthContainerVisible} from './../reducers/actions/AuthContainerAction';
-import {setAdminDisplayMode} from './../reducers/actions/AdminAction'
+import {setAdminDisplayMode} from './../reducers/actions/AdminAction';
+import {setFiles} from './../reducers/actions/fileAction';
 import {scroller} from 'react-scroll';
 import {userService} from './../app-context/context';
 
@@ -111,8 +112,9 @@ class HeaderContainer extends React.Component {
                     this.props.dispatch(setIsAuthenticated(false, null));
                     this.props.dispatch(setIsAuthContainerVisible("none"));
                     this.props.dispatch(setAdminDisplayMode("none"));
+                    this.props.dispatch(setFiles(null, "none"));
                   } else {
-                    alert("Something wrong!")
+                    alert("Халепа! Щось пішло не так.")
                   }
                 })
               }}>Вийти</li>
@@ -155,6 +157,7 @@ class HeaderContainer extends React.Component {
         adminDisplayMode={this.props.adminDisplayMode}
         toMainDisplayMode={this.props.toMainDisplayMode}
         onBurgerClick={this.onBurgerClick}
+        isDocsVisible={this.props.files.filesVisibility}
         />
     );
   }
@@ -163,6 +166,7 @@ class HeaderContainer extends React.Component {
 const mapStateToProps = (state) => {
   return Object.assign({}, state, {
     user: state.user,
+    files: state.files,
     isAuthenticated: state.user.isAuthenticated,
     isAuthVisible: state.authContainer.isAuthVisible,
     adminDisplayMode: state.adminDisplayMode.adminDisplayMode,

@@ -2,7 +2,6 @@ package com.airnavigation.tradeunion.security;
 
 import com.airnavigation.tradeunion.domain.Role;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,7 +11,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -27,7 +26,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final AuthenticationProviderImplementation authenticationProvider;
     private final UserDetailsServiceImplementation userDetailsService;
-    private final PasswordEncoder passwordEncoder;
     private final RESTAuthenticationSuccessHandler authenticationSuccessHandler;
     private final RESTAuthenticationEntryPoint authenticationEntryPoint;
     private final RESTAuthenticationFailureHandler authenticationFailureHandler;
@@ -40,21 +38,14 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                                      RESTAuthenticationFailureHandler authenticationFailureHandler) {
         this.authenticationProvider = authenticationProvider;
         this.userDetailsService = userDetailsService;
-        //TODO: Change password encoder
-        this.passwordEncoder = NoOpPasswordEncoder.getInstance();
         this.authenticationSuccessHandler = authenticationSuccessHandler;
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.authenticationFailureHandler = authenticationFailureHandler;
     }
 
-    @SuppressWarnings("SpellCheckingInspection")
-    @Value("11")
-    private int bcryptStrength;
-
-
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
 
     @Override
@@ -72,16 +63,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception{
         http
                 .authorizeRequests()
-                //TODO: Repair this before production
-                .antMatchers("/css/**", "/js/**", "/index*", "/json/**", "/*.ico", "/images/**", "/h2/**", "/console/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/main").permitAll()
-                .antMatchers(HttpMethod.GET, "/adop").permitAll()
-                .antMatchers(HttpMethod.PUT, "/password").permitAll()
-
-                .antMatchers(HttpMethod.GET, "/user/**").hasRole(Role.USER.name())
-                .antMatchers(HttpMethod.GET, "/user/**").authenticated()
-                .antMatchers(HttpMethod.PUT, "/user/**").hasRole(Role.USER.name())
-                .antMatchers(HttpMethod.PUT, "/user/**").authenticated()
 
                 .antMatchers(HttpMethod.GET, "/administrator/**").hasRole(Role.ADMINISTRATOR.name())
                 .antMatchers(HttpMethod.GET, "/administrator/**").authenticated()
@@ -92,6 +73,19 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.DELETE, "/administrator/**").hasRole(Role.ADMINISTRATOR.name())
                 .antMatchers(HttpMethod.DELETE, "/administrator/**").authenticated()
 
+                .antMatchers(HttpMethod.GET, "/user/**").hasRole(Role.USER.name())
+                .antMatchers(HttpMethod.GET, "/user/**").authenticated()
+                .antMatchers(HttpMethod.PUT, "/user/**").hasRole(Role.USER.name())
+                .antMatchers(HttpMethod.PUT, "/user/**").authenticated()
+                .antMatchers(HttpMethod.GET, "/full_main/{\\d+}").hasRole(Role.USER.name())
+                .antMatchers(HttpMethod.GET, "/full_main/{\\d+}").authenticated()
+                .antMatchers(HttpMethod.POST, "/feedback/{\\d+}").hasRole(Role.USER.name())
+                .antMatchers(HttpMethod.POST, "/feedback/{\\d+}").authenticated()
+
+                //TODO: Repair this before production
+                .antMatchers("/css/**", "/js/**", "/index*", "/json/**", "/*.ico", "/images/**", "/h2/**", "/console/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/main").permitAll()
+                .antMatchers(HttpMethod.PUT, "/password").permitAll()
             .and()
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
             .and()
@@ -107,7 +101,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .tokenValiditySeconds(6000)
             .and()
                 .logout()
-                .logoutUrl("/user/logout")
+                .logoutUrl("/user/logout").permitAll()
             .and()
                 //TODO: Remove this on production
                 .headers()
@@ -130,4 +124,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         return source;
     }
 
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 }

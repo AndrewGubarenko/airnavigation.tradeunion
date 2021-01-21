@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 /**
  * @author Andrii Hubarenko
@@ -25,7 +26,57 @@ public class File {
     @Column(name = "PATH", nullable = false)
     String path;
 
-/*    @SuppressWarnings("SpellCheckingInspection")
-    @Column(name = "IS_ADOP", nullable = false)
-    Boolean isAdop;*/
+    @ManyToOne
+    @JoinColumn(name="category_id", nullable=false)
+    private Category category;
+
+    public void setCategory(Category category) {
+        this.setCategory(category, false);
+    }
+
+    protected void setCategory(Category category, boolean otherSideHasBeenSet) {
+        this.category = category;
+        if(otherSideHasBeenSet) {
+            return;
+        }
+        category.addFile(this, true);
+    }
+
+    public void removeCategory() {
+        removeCategory(this.category, false);
+    }
+
+    protected void removeCategory(Category category, boolean otherSideHasBeenSet) {
+        this.category = null;
+        if(otherSideHasBeenSet) {
+            return;
+        }
+        category.removeFile(this, true);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof File)) return false;
+        File file = (File) o;
+        return id == file.id &&
+                name.equals(file.name) &&
+                path.equals(file.path) &&
+                category.equals(file.category);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, path, category);
+    }
+
+    @Override
+    public String toString() {
+        return "File{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", path='" + path + '\'' +
+                ", category=" + category +
+                '}';
+    }
 }

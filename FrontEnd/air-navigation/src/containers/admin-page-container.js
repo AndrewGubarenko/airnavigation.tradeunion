@@ -600,9 +600,13 @@ class AdminPageContainer extends React.Component {
     this.clearState();
     this.props.dispatch(setSpinnerVisibility("inline-block"));
     await adminService.getListOfFiles().then(response => {
-      return response.json()
-    }).then(data => {
-      this.createFilesListForPrint(data);
+      if(response.ok) {
+          return response.json().then(data => {
+          this.createFilesListForPrint(data);
+        });
+      } else {
+        return response.text().then(error => {this.setState({terminalData: error})});
+      }
     });
     this.props.dispatch(setSpinnerVisibility("none"));
   }
@@ -611,15 +615,19 @@ class AdminPageContainer extends React.Component {
     this.clearState();
     this.props.dispatch(setSpinnerVisibility("inline-block"));
     await adminService.getLogs().then(response => {
-      return response.json()
-    }).then(data => {
-      this.createLogsListForPrint(data);
-    }).then(() => {scroller.scrollTo("footer", {
-                                                  spy: true,
-                                                  smooth: true,
-                                                  offset:-300,
-                                                  duration: 500
-                                                });});
+      if(response.ok) {
+          return response.json().then(data => {
+          this.createLogsListForPrint(data);
+        }).then(() => {scroller.scrollTo("footer", {
+                                                      spy: true,
+                                                      smooth: true,
+                                                      offset:-300,
+                                                      duration: 500
+                                                    });});
+      } else {
+        return response.text().then(error => {this.setState({terminalData: error})});
+      }
+    });
     this.props.dispatch(setSpinnerVisibility("none"));
   }
 /*Menu functions*/

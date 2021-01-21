@@ -15,6 +15,6 @@ public class RESTAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
                                         Authentication authentication) throws IOException {
         clearAuthenticationAttributes(request);
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        response.sendRedirect("/user/" + userDetails.getId());
+        response.sendRedirect("/full_main/" + userDetails.getId());
     }
 }

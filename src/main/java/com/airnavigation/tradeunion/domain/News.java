@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 /**
  * @author Andrii Hubarenko
@@ -25,4 +26,27 @@ public class News {
     @Column(name = "TEXT", columnDefinition = "TEXT")
     String text;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof News)) return false;
+        News news = (News) o;
+        return id == news.id &&
+                title.equals(news.title) &&
+                text.equals(news.text);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, text);
+    }
+
+    @Override
+    public String toString() {
+        return "News{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", text='" + text + '\'' +
+                '}';
+    }
 }

@@ -25,7 +25,8 @@ class Header extends React.Component {
                 <span className="label-text">Email</span>
                 <input  className="auth__input"
                         onChange={this.props.onChangeEmail}
-                        value={this.props.email}/>
+                        value={this.props.email}
+                        autoComplete="on"/>
               </label>
               <div>
                 <label id="forgot_password">

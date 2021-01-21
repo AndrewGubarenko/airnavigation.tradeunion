@@ -5,6 +5,7 @@ import com.airnavigation.tradeunion.domain.News;
 import com.airnavigation.tradeunion.exceptions.IllegalAccessAttemtException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,7 @@ public class NewsService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
     public News createNews(News news) {
         newsRepository.save(news);
         return news;
@@ -47,6 +49,7 @@ public class NewsService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
     public News changeNews(News updatedNews, long id) {
         Optional<News> newsForUpdateOpt = newsRepository.findById(id);
         if (newsForUpdateOpt.isPresent()) {
@@ -66,6 +69,7 @@ public class NewsService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
     public String deleteNews(long id) {
         newsRepository.deleteById(id);
         return "Новина успішно видалена";

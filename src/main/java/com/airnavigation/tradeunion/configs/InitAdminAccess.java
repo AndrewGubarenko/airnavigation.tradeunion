@@ -8,6 +8,7 @@ import com.airnavigation.tradeunion.services.AdminService;
 import com.airnavigation.tradeunion.utilities.EmailServiceImpl;
 import com.airnavigation.tradeunion.utilities.TemporaryPasswordGenerator;
 import org.apache.log4j.Logger;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,21 +24,26 @@ class InitAdminAccess {
     private final AdminRepository adminRepository;
     private final TemporaryPasswordGenerator passwordGenerator;
     private final EmailServiceImpl emailService;
+    private final PasswordEncoder passwordEncoder;
 
     public InitAdminAccess(AdminRepository adminRepository,
                            TemporaryPasswordGenerator passwordGenerator,
-                           EmailServiceImpl emailService) {
+                           EmailServiceImpl emailService,
+                           PasswordEncoder passwordEncoder) {
         this.adminRepository = adminRepository;
         this.passwordGenerator = passwordGenerator;
         this.emailService = emailService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostConstruct
     @Transactional
     protected void createDefaultUsers() {
         User user = adminRepository.save(
-                User.builder().username("andrewgubarenko@gmail.com")
-                        .password(passwordGenerator.generateTemporaryPassword(30))
+                //TODO: Repair this row
+                User.builder().username("123")
+                        //TODO: Repair this row
+                        .password(passwordEncoder.encode("123"/*passwordGenerator.generateTemporaryPassword(30)*/))
                         .firstName("Андрій Сергійович")
                         .lastName("Губаренко")
                         .count(0.00)

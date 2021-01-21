@@ -1,7 +1,7 @@
 import React from 'react';
 import MainPage from '../components/main-page';
 import NewsContainer from './news-container';
-import FileContainer from './file-container';
+import FilesContainer from './file-container';
 import UserDataContainer from './user-data-container';
 import AuthenticationContainer from './authentication-container';
 import {connect} from 'react-redux';
@@ -10,6 +10,8 @@ import {setFiles} from './../reducers/actions/fileAction';
 import {representationService} from './../app-context/context';
 import {setToMainDisplayMode} from './../reducers/actions/OnMainPageAction';
 import {setSpinnerVisibility} from './../reducers/actions/spinnerAction';
+import {setIsAuthenticated} from './../reducers/actions/userAction';
+import {setAdminDisplayMode} from './../reducers/actions/AdminAction';
 
 class MainPageContainer extends React.Component {
 
@@ -25,19 +27,35 @@ class MainPageContainer extends React.Component {
 
   componentDidMount() {
     this.props.dispatch(setToMainDisplayMode("none"));
-    representationService.get().then((data) =>  data.json()).then(representation => {
-      this.props.dispatch(setNews(representation.newsList));
-      this.props.dispatch(setFiles(representation.fileList));
-    }).then(() => {
-      this.setNews();
-      this.setFiles();
-    });
+    if(this.props.isAuthenticated) {
+      representationService.getFullMain(this.props.user.id).then((data) =>  data.json()).then(representation => {
+        this.props.dispatch(setNews(representation.newsList));
+        this.props.dispatch(setFiles(representation.fileList, "block"));
+        if(representation.authorizedUser){
+          this.props.dispatch(setIsAuthenticated(true, representation.authorizedUser));
+          if(representation.authorizedUser.roles.includes("ADMINISTRATOR")) {
+            this.props.dispatch(setAdminDisplayMode("block"));
+          }
+        }
+      }).then(() => {
+        this.setFilesContainer()
+        this.setNews();
+      });
+    } else {
+      representationService.getTruncatedMain().then((data) =>  data.json()).then(representation => {
+        this.props.dispatch(setNews(representation.newsList));
+        this.props.dispatch(setFiles(null, "none"));
+      }).then(() => {
+        this.setNews();
+      });
+    }
+    this.setState({filesVisibility: this.props.filesVisibility})
     this.props.dispatch(setSpinnerVisibility("none"));
   }
 
   setNews = () => {
     let shortNewsArray = [];
-    if (!!this.props.news.listOfNews.length) {
+    if (this.props.news.listOfNews.length) {
       for (let i = 0; i < this.props.news.listOfNews.length && i < 4; i++) {
         shortNewsArray[i] = <NewsContainer
           key={this.props.news.listOfNews[i].id}
@@ -52,7 +70,7 @@ class MainPageContainer extends React.Component {
 
   expandNews = () => {
     let longNewsArray = [];
-    if (!!this.props.news.listOfNews.length) {
+    if (this.props.news.listOfNews.length) {
       this.props.news.listOfNews.forEach((singleNew, i) => {
         longNewsArray[i] = <NewsContainer
           key={singleNew.id}
@@ -63,36 +81,6 @@ class MainPageContainer extends React.Component {
       longNewsArray[0] = <p key="zeroNews">Покищо немає новин..</p>
     }
     this.setState({newsArray: longNewsArray});
-  }
-
-  setFiles = () => {
-    let shortFilesArray = [];
-    if (!!this.props.files.listOfFiles.length) {
-      for (let i = 0; i < this.props.files.listOfFiles.length && i < 4; i++) {
-        shortFilesArray[i] = <FileContainer
-          key={this.props.files.listOfFiles[i].id}
-          file={this.props.files.listOfFiles[i]}
-           />
-      }
-    } else {
-      shortFilesArray[0] = <p key="zeroFiles">Покищо немає файлів..</p>
-    }
-    this.setState({filesArray: shortFilesArray});
-  }
-
-  expandFiles = () => {
-    let longFilesArray = [];
-    if (!!this.props.files.listOfFiles.length) {
-      this.props.files.listOfFiles.forEach((file, i) => {
-        longFilesArray[i] = <FileContainer
-          key={file.id}
-          file={file}
-           />
-      });
-    } else {
-      longFilesArray[0] = <p key="zeroFiles">Покищо немає файлів..</p>
-    }
-    this.setState({filesArray: longFilesArray});
   }
 
   setUserData = () => {
@@ -123,13 +111,15 @@ class MainPageContainer extends React.Component {
     }
   }
 
-  onClickExpandArrowFiles = () => {
-    if (this.state.arrowFilesClassName === "expandArrow") {
-      this.setState({arrowFilesClassName: "expandArrow open"});
-      this.expandFiles();
-    } else if (this.state.arrowFilesClassName === "expandArrow open") {
-      this.setState({arrowFilesClassName: "expandArrow"});
-      this.setFiles();
+  setFilesContainer = () => {
+    if(this.props.isAuthenticated) {
+      return(
+        <FilesContainer
+          displayFiles={this.props.files.filesVisibility}
+          isAuthenticated={this.props.isAuthenticated}
+          files={this.props.files}
+          />
+      );
     }
   }
 
@@ -140,9 +130,8 @@ class MainPageContainer extends React.Component {
         files={this.state.filesArray}
         user={this.setUserData()}
         onClickExpandArrowNews={this.onClickExpandArrowNews}
-        onClickExpandArrowFiles={this.onClickExpandArrowFiles}
         arrowNewsClassName={this.state.arrowNewsClassName}
-        arrowFilesClassName={this.state.arrowFilesClassName}
+        FilesContainer={this.setFilesContainer}
         />
     );
   }
@@ -154,6 +143,7 @@ const mapStateToProps = (state) => {
     files: state.files,
     user: state.user.user,
     isAuthenticated: state.user.isAuthenticated,
+    adminDisplayMode: state.adminDisplayMode,
     spinnerVisibility: state.spinnerVisibility.spinnerVisibility
   });
 }
