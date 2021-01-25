@@ -72,7 +72,6 @@ class ChangePasswordContainer extends React.Component {
         });
       })
       this.props.dispatch(setSpinnerVisibility("none"));
-      
     }
   }
 

@@ -10,7 +10,8 @@ const userReducer = (state = startState, action) => {
   if(action.type === SET_IS_AUTHENTICATED) {
     return Object.assign({}, state, {
           isAuthenticated: action.isAuthenticated,
-          user: action.user
+          user: action.user,
+          isAdmin: action.isAdmin
         });
   }
   return state;

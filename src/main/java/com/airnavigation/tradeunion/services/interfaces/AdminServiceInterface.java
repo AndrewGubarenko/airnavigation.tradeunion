@@ -75,8 +75,9 @@ public interface AdminServiceInterface {
 
     /**
      * Method for retrieving server logs
-     * @return list of logs
+     * @param amountOfLogs
+     * @return list of logs with length equals amountOfLogs
      * @throws IOException
      */
-    List<String> getLogs() throws IOException;
+    List<String> getLogs(int amountOfLogs) throws IOException;
 }

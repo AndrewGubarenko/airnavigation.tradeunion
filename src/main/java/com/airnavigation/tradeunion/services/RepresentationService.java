@@ -1,5 +1,6 @@
 package com.airnavigation.tradeunion.services;
 
+import com.airnavigation.tradeunion.domain.News;
 import com.airnavigation.tradeunion.domain.PlainDomain.RepresentationContainer;
 import com.airnavigation.tradeunion.domain.User;
 import com.airnavigation.tradeunion.services.interfaces.UserServiceInterface;
@@ -7,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
+import java.util.List;
 
 @Service
 public class RepresentationService {
@@ -28,7 +32,9 @@ public class RepresentationService {
     @PreAuthorize("permitAll()")
     public RepresentationContainer createOpenRepresentation () {
         RepresentationContainer representation = new RepresentationContainer();
-        representation.setNewsList(newsService.getListOfNews());
+        List<News> newsList = newsService.getListOfNews();
+        Collections.reverse(newsList);
+        representation.setNewsList(newsList);
         return representation;
     }
 
@@ -37,9 +43,11 @@ public class RepresentationService {
     public RepresentationContainer createRestrictRepresentation (long id) {
         RepresentationContainer representation = new RepresentationContainer();
         User authenticatedUser = userService.getUser(id);
+        List<News> newsList = newsService.getListOfNews();
+        Collections.reverse(newsList);
         representation.setAuthorizedUser(authenticatedUser);
         representation.setFileList(fileService.getFiles());
-        representation.setNewsList(newsService.getListOfNews());
+        representation.setNewsList(newsList);
         return representation;
     }
 }

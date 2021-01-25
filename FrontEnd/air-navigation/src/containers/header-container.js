@@ -108,11 +108,11 @@ class HeaderContainer extends React.Component {
                 userService.logout().then(response => {
                   if(response.ok) {
                     this.setState({isBurgerChecked: false});
-                    this.props.history.push("/main");
-                    this.props.dispatch(setIsAuthenticated(false, null));
+                    this.props.dispatch(setIsAuthenticated(false, null, false));
                     this.props.dispatch(setIsAuthContainerVisible("none"));
                     this.props.dispatch(setAdminDisplayMode("none"));
                     this.props.dispatch(setFiles(null, "none"));
+                    this.props.history.push("/main");
                   } else {
                     alert("Халепа! Щось пішло не так.")
                   }

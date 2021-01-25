@@ -27,8 +27,11 @@ public class File {
     String path;
 
     @ManyToOne
-    @JoinColumn(name="category_id", nullable=false)
+    @JoinColumn(name="category_id")
     private Category category;
+
+    @Column(name = "SUB_CATEGORY", nullable = false)
+    String subCategory;
 
     public void setCategory(Category category) {
         this.setCategory(category, false);
@@ -61,13 +64,12 @@ public class File {
         File file = (File) o;
         return id == file.id &&
                 name.equals(file.name) &&
-                path.equals(file.path) &&
-                category.equals(file.category);
+                path.equals(file.path);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, path, category);
+        return Objects.hash(id, name, path);
     }
 
     @Override

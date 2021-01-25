@@ -30,6 +30,7 @@ class AdminPage extends React.Component {
             <div className="interactive_button_container" style={{display: this.props.fileBtnContainerDisplay}}>
               <button className="admin_screen_btn" onClick={this.props.onClickAddFile}>Add file</button>
             </div>
+
 {/*user panels*/}
             <div className="interactive_control_panel" style={{display: this.props.userControlPanelDisplay}}>
               <div className="interactive_control_panel_row">
@@ -157,6 +158,16 @@ class AdminPage extends React.Component {
             </div>
 
 {/*files panels*/}
+
+{/*logs panels*/}
+            <div className="interactive_control_panel" style={{display: this.props.logsControlPanelDisplay}}>
+              <div className="interactive_control_panel_row">
+                <span>Amount: </span><input className="terminal_input" onChange={this.props.onChangeAmount} value={this.props.amountOfLogs} />
+              </div>
+              <button className="admin_screen_btn" onClick={this.props.onClickGetAmountOfLogs}>Get logs</button>
+            </div>
+{/*logs panels*/}
+
 {/*Files upload functions*/}
             <div className="interactive_control_panel" style={{display: this.props.XMLCountUodateControlPanelDisplay}}>
               <div className="interactive_control_panel_file_upload">

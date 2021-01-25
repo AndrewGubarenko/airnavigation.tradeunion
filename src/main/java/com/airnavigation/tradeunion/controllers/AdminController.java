@@ -162,6 +162,12 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @DeleteMapping(path = "/sub_category")
+    public ResponseEntity<String> removeSubCategory(@RequestBody Map<String, String> categoryNames) {
+        String response = fileService.removeSubCategory(categoryNames.get("categoryName"), categoryNames.get("subCategoryName"));
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     @DeleteMapping(path = "/category/{name}")
     public ResponseEntity<String> deleteCategory(@PathVariable String name) {
         String response = fileService.deleteCategory(name);
@@ -202,9 +208,9 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping(path = "/logs")
-    public ResponseEntity<List<String>> getLogs() throws IOException {
-        List<String> response = adminService.getLogs();
+    @GetMapping(path = "/logs/{amountOfLogs}")
+    public ResponseEntity<List<String>> getLogs(@PathVariable int amountOfLogs) throws IOException {
+        List<String> response = adminService.getLogs(amountOfLogs);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

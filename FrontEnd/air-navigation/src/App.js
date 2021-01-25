@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {BrowserRouter, Route} from 'react-router-dom';
+import { Redirect } from 'react-router'
 import MainPageContainer from './containers/main-page-container';
 import HeaderContainer from './containers/header-container';
 import Footer from './components/footer';
@@ -15,19 +16,52 @@ import {store, persistor} from './reducers/store';
 import { PersistGate } from 'redux-persist/integration/react';
 
 class App extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      isAuthenticated: false,
+      isAdmin: false
+    };
+  }
+
+  componentDidMount() {
+    store.subscribe(() => {
+      this.setState({isAuthenticated: store.getState().user.isAuthenticated});
+    })
+    store.subscribe(() => {
+      this.setState({isAdmin: store.getState().user.isAdmin});
+    })
+  }
+
   render() {
     return (
       <Provider store={store}>
-        <PersistGate loading={<h1 style={{display: "flex", justifyContent: "center"}}>Loading...</h1>} persistor={persistor}>
+        <PersistGate persistor={persistor}>
           <BrowserRouter>
+            <Route exact path="/" render={() => {return(<Redirect to="/main"/>)}} />
             <Route path="/" component={HeaderContainer} />
             <Route path="/" component={SpinnerContainer} />
             <Route path="/" component={GoUpButtonContainer} />
             <Route path="/main" component={MainPageContainer} />
-            <Route path="/change_password" component={ChangePasswordContainer} />
+            <Route path="/change_password" render={()=>{
+                if(this.state.isAuthenticated) {
+                  return(<ChangePasswordContainer/>)
+                } else {
+                  return(<Redirect to="/main"/>)
+                }
+              }
+            }/>
             <Route path="/restore_password" component={RestorePasswordContainer} />
             <Route path="/news/:id" component={SingleNewContainer} />
-            <Route path="/administrator" component={AdminPageContainer} />
+            <Route path="/administrator" render={()=>{
+                if(this.state.isAdmin) {
+                  return(<AdminPageContainer/>)
+                } else {
+                  return(<Redirect to="/main"/>)
+                }
+              }
+            }/>
             <Route path="/" component={Footer} />
           </BrowserRouter>
         </PersistGate>

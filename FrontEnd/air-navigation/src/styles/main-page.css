@@ -28,6 +28,10 @@
   flex-direction: column;
 }
 
+.standart-container:last-child {
+  margin-bottom: 80px;
+}
+
 .container-name {
   margin: 0 0 0 10%;
   font-size: 32px;
@@ -215,7 +219,7 @@
 }
 
 #file__container {
-  
+
 }
 
 @media (max-width: 1199px) {

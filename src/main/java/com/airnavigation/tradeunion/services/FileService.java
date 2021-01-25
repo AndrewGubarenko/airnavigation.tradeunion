@@ -11,10 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @PreAuthorize("isAuthenticated()")
@@ -35,7 +32,8 @@ public class FileService {
     @Transactional
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     public File addFile(File file) {
-        Category category = this.createCategoryOrReturnActual(file.getCategory().getName());
+        file.setSubCategory(file.getSubCategory().trim().toLowerCase());
+        Category category = this.createCategoryOrReturnActual(file.getCategory().getName(), file.getSubCategory());
         file.setCategory(category);
         return filesRepository.save(file);
     }
@@ -67,7 +65,8 @@ public class FileService {
             }
             fileForUpdate.setName(updatedFile.getName());
             fileForUpdate.setPath(updatedFile.getPath());
-            fileForUpdate.setCategory(this.createCategoryOrReturnActual(updatedFile.getCategory().getName()));
+            fileForUpdate.setSubCategory(updatedFile.getSubCategory().trim().toLowerCase());
+            fileForUpdate.setCategory(this.createCategoryOrReturnActual(updatedFile.getCategory().getName(), updatedFile.getSubCategory()));
             filesRepository.save(fileForUpdate);
             return updatedFile;
         } else {
@@ -91,13 +90,21 @@ public class FileService {
 
     @Transactional
     @PreAuthorize("hasRole('ADMINISTRATOR')")
-    Category createCategoryOrReturnActual(String categoryName) {
+    Category createCategoryOrReturnActual(String categoryName, String subCategory) {
         Optional<Category> categoryOpt = categoryRepository.findByName(categoryName.trim().toUpperCase());
         if(categoryOpt.isPresent()) {
-            return categoryOpt.get();
+            Category result = categoryOpt.get();
+            if(result.getSubCategories().contains(subCategory.trim().toLowerCase())) {
+                return result;
+            } else {
+                result.getSubCategories().add(subCategory.trim().toLowerCase());
+                return categoryRepository.save(result);
+            }
+
         } else {
             Category category = new Category();
             category.setName(categoryName.trim().toUpperCase());
+            category.getSubCategories().add(subCategory.trim().toLowerCase());
             LOGGER.info("Category " + categoryName + " has been created");
             return categoryRepository.save(category);
         }
@@ -133,6 +140,51 @@ public class FileService {
                     .append(" was not found.");
             LOGGER.warn(loggerResponse);
             throw new NoSuchElementException(loggerResponse.toString());
+        }
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
+    public String removeSubCategory(String categoryName, String subCategoryName) {
+        StringBuilder response = new StringBuilder();
+        Optional<Category> resultOpt = categoryRepository.findByName(categoryName.trim().toUpperCase());
+        Category category;
+        if(resultOpt.isPresent()) {
+            category = resultOpt.get();
+            Set<File> fileList = category.getFiles();
+            if (fileList.isEmpty()) {
+                category.getSubCategories().remove(subCategoryName.trim().toLowerCase());
+                categoryRepository.save(category);
+                response.append("Sub_category ")
+                        .append(subCategoryName.trim().toLowerCase())
+                        .append(" was removed");
+                return response.toString();
+            } else {
+                int isReadyForRemove = 0;
+                response.append("Files with subCategory ")
+                        .append(subCategoryName.trim().toLowerCase())
+                        .append(": ");
+                for(Iterator<File> iterator = fileList.iterator(); iterator.hasNext(); ) {
+                    File file = iterator.next();
+                    if(file.getSubCategory().equals(subCategoryName.trim().toLowerCase())) {
+                        isReadyForRemove++;
+                        response.append(file.getName())
+                                .append(", ");
+                    }
+                }
+                response.append(" remove them or change it's subCategory before removing subCategory.");
+                if(isReadyForRemove != 0) {
+                    return response.toString();
+                } else {
+                    return new StringBuilder().append("SubCategory ").append(subCategoryName.trim().toLowerCase()).append(" was removed.").toString();
+                }
+            }
+        } else {
+            response.append("Category ")
+                    .append(categoryName)
+                    .append(" was not found.");
+            LOGGER.warn(response);
+            return response.toString();
         }
     }
 

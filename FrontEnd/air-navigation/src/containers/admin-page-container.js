@@ -35,6 +35,7 @@ class AdminPageContainer extends React.Component {
       newsList: [],
       filesList: [],
       logs: "",
+      amountOfLogs: 0,
       selectedCountFile: null,
       selectedDatabaseFile: null,
       userBtnContainerDisplay: "none",
@@ -55,6 +56,7 @@ class AdminPageContainer extends React.Component {
       DeleteFileYesNoContainerDisplay: "none",
       XMLCountUodateControlPanelDisplay: "none",
       XMLDatabaseUpdateControlPanelDisplay: "none",
+      logsControlPanelDisplay: "none",
       selected: "MALE",
       checked: false,
       borderColorUsername: "darkgrey",
@@ -101,6 +103,7 @@ class AdminPageContainer extends React.Component {
                       newsList: [],
                       filesList: [],
                       logs: "",
+                      amountOfLogs: 0,
                       selectedCountFile: null,
                       selectedDatabaseFile: null,
                       userBtnContainerDisplay: "none",
@@ -121,6 +124,7 @@ class AdminPageContainer extends React.Component {
                       DeleteFileYesNoContainerDisplay: "none",
                       XMLCountUodateControlPanelDisplay: "none",
                       XMLDatabaseUpdateControlPanelDisplay: "none",
+                      logsControlPanelDisplay: "none",
                       selected: "MALE",
                       checked: false,
                       borderColorUsername: "darkgrey",
@@ -540,9 +544,16 @@ class AdminPageContainer extends React.Component {
           <div>
               {
                 list.map(item => {
+                  let log = JSON.stringify(item);
+                  let color;
+                  if (log.indexOf("INFO") !== -1) {
+                    color = "green";
+                  } else {
+                    color = "red";
+                  }
                   return(
                     <div key={count} className="admin_result_list_item">
-                      <pre>{++count}) {JSON.stringify(item)}</pre>
+                      <pre style={{color: color}}>{++count}) {log}</pre>
                     </div>
                   );
                 })
@@ -611,10 +622,12 @@ class AdminPageContainer extends React.Component {
     this.props.dispatch(setSpinnerVisibility("none"));
   }
 
-  onClickGetLogs = async () => {
-    this.clearState();
+  onChangeAmount = (event) => {
+    this.setState({amountOfLogs: event.target.value});
+  }
+  onClickGetAmountOfLogs = async () => {
     this.props.dispatch(setSpinnerVisibility("inline-block"));
-    await adminService.getLogs().then(response => {
+    await adminService.getLogs(this.state.amountOfLogs).then(response => {
       if(response.ok) {
           return response.json().then(data => {
           this.createLogsListForPrint(data);
@@ -629,6 +642,10 @@ class AdminPageContainer extends React.Component {
       }
     });
     this.props.dispatch(setSpinnerVisibility("none"));
+  }
+  onClickGetLogs = () => {
+    this.clearState();
+    this.setState({logsControlPanelDisplay: "block"});
   }
 /*Menu functions*/
 /*Files upload functions*/
@@ -657,7 +674,13 @@ class AdminPageContainer extends React.Component {
       if(response.ok) {
         return response.json().then(array => {
         return array.map(item => {
-          return(<pre>{item}</pre>);
+          let color;
+          if (item.indexOf("INFO") !== -1) {
+            color = "green";
+          } else {
+            color = "red";
+          }
+          return(<pre style={{color: color}}>{item}</pre>);
           })
         }).then(result => {
           this.setState({terminalData: result});
@@ -708,6 +731,7 @@ class AdminPageContainer extends React.Component {
         file={this.state.file}
         selected={this.state.selected}
         checked={this.state.checked}
+        amountOfLogs={this.state.amountOfLogs}
 
         userBtnContainerDisplay={this.state.userBtnContainerDisplay}
         newsBtnContainerDisplay={this.state.newsBtnContainerDisplay}
@@ -725,6 +749,7 @@ class AdminPageContainer extends React.Component {
         filesUpdateControlPanelDisplay={this.state.filesUpdateControlPanelDisplay}
         DeleteFileButtonDisplay={this.state.DeleteFileButtonDisplay}
         DeleteFileYesNoContainerDisplay={this.state.DeleteFileYesNoContainerDisplay}
+        logsControlPanelDisplay={this.state.logsControlPanelDisplay}
 
         borderColorUsername={this.state.borderColorUsername}
         borderColorFirstName={this.state.borderColorFirstName}
@@ -787,6 +812,9 @@ class AdminPageContainer extends React.Component {
         XMLDatabaseUpdateControlPanelDisplay={this.state.XMLDatabaseUpdateControlPanelDisplay}
         onChangeUpdateDatabaseFile={this.onChangeUpdateDatabaseFile}
         onClickUploadDatabaseFile={this.onClickUploadDatabaseFile}
+
+        onChangeAmount={this.onChangeAmount}
+        onClickGetAmountOfLogs={this.onClickGetAmountOfLogs}
 
         terminalData={this.state.terminalData}
         />

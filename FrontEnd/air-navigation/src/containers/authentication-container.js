@@ -63,11 +63,13 @@ class AuthenticationContainer extends React.Component {
         if(response.redirected && response.ok) {
           response.json().then(representation => {
             this.props.dispatch(setNews(representation.newsList));
-            this.props.dispatch(setFiles(representation.fileList, "block"));
-            this.props.dispatch(setIsAuthenticated(true, representation.authorizedUser));
             if(representation.authorizedUser.roles.includes("ADMINISTRATOR")) {
+              this.props.dispatch(setIsAuthenticated(true, representation.authorizedUser, true));
               this.props.dispatch(setAdminDisplayMode("block"));
+            } else {
+              this.props.dispatch(setIsAuthenticated(true, representation.authorizedUser, false));
             }
+            this.props.dispatch(setFiles(representation.fileList, "block"));
           });
         } else {
           this.setState({message: "Не вдалося авторизуватися. Спробуйте ще."});

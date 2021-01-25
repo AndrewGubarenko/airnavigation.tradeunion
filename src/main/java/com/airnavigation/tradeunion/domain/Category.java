@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -22,13 +23,14 @@ public class Category {
     @Column(name = "name", unique = true, nullable = false)
     private String name;
 
+    @ElementCollection(targetClass = HashSet.class, fetch = FetchType.EAGER)
+    @CollectionTable(name="sub_categories")
+    private Set<String> subCategories = new HashSet<>();
+
     @OneToMany(mappedBy="category", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonIgnore
     private Set<File> files = new HashSet<>();
 
-    public void addFile(File file) {
-        this.addFile(file, false);
-    }
 
     protected void addFile(File file, boolean otherSideHasBeenSet) {
         this.getFiles().add(file);
@@ -36,10 +38,6 @@ public class Category {
             return;
         }
         file.setCategory(this, true);
-    }
-
-    public void removeFile(File file) {
-        removeFile(file, false);
     }
 
     protected void removeFile(File file, boolean otherSideHasBeenSet) {
@@ -69,6 +67,8 @@ public class Category {
         return "Category{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
+                ", subCategories=" + subCategories +
+                ", files=" + files +
                 '}';
     }
 }

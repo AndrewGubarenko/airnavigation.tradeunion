@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.NonUniqueResultException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -61,6 +62,14 @@ public class AdminService implements AdminServiceInterface {
             LOGGER.warn("METHOD CREATE: The username field is empty!");
             throw new EmptyDataFieldsException("Поле email - порожнє!");
         }
+
+        Optional<User> userForCheckOpt = adminRepository.findByFirstNameAndLastNameIgnoreCase(user.getFirstName().trim(), user.getLastName());
+        if(userForCheckOpt.isPresent()) {
+            String response = "METHOD CREATE: The user with firstName: " + user.getFirstName().trim() + " and lastName: " + user.getLastName() + " already exist";
+            LOGGER.warn(response);
+            return userForCheckOpt.get();
+        }
+
         user.setUsername(user.getUsername().trim());
         user.setFirstName(user.getFirstName().trim());
         user.setLastName(user.getLastName().trim());
@@ -73,20 +82,14 @@ public class AdminService implements AdminServiceInterface {
         if(user.getRoles() == null || user.getRoles().isEmpty()) {
             user.setRoles(new HashSet<>(Arrays.asList(Role.USER)));
             user.setPassword(passwordEncoder.encode(passwordGenerator.generateTemporaryPassword(15)));
-            //TODO: remove this line
-            System.out.println(user.getPassword());
             accessLevel = Role.USER.name();
         } else if(user.getRoles().contains(Role.ADMINISTRATOR)) {
             user.setPassword(passwordEncoder.encode(passwordGenerator.generateTemporaryPassword(30)));
-            //TODO: remove this line
-            System.out.println(user.getPassword());
             accessLevel = Role.ADMINISTRATOR.name();
         } else {
             user.getRoles().add(Role.USER);
             accessLevel = Role.USER.name();
             user.setPassword(passwordEncoder.encode(passwordGenerator.generateTemporaryPassword(15)));
-            //TODO: remove this line
-            System.out.println(user.getPassword());
         }
         adminRepository.save(user);
         //TODO: Enable this module before production
@@ -105,12 +108,11 @@ public class AdminService implements AdminServiceInterface {
     }
 
     @Override
-    @Transactional
     public Set<User> updateDB(byte[] file, String fileExtension) throws IOException {
         Set<User> result = new LinkedHashSet<>();
         fileProcessor.readFileForDBCreation(file, fileExtension).forEach(user -> {
             if(user.getUsername() == null || user.getUsername().equals("")) {
-                LOGGER.info("METHOD CREATE: User was not created. Username is null or empty");
+                LOGGER.warn("METHOD CREATE: User was not created. Username is null or empty");
                 return;
             } else if(adminRepository.findByUsername(user.getUsername()).isPresent()) {
                 LOGGER.info("METHOD CREATE: User with username " + user.getUsername() + " already exist");
@@ -135,7 +137,7 @@ public class AdminService implements AdminServiceInterface {
                 User userForUpdate = userForUpdateOpt.get();
                 userForUpdate.setCount(Double.valueOf(userDataContainer[2]));
                 adminRepository.save(userForUpdate);
-                response
+                response.append("INFO: ")
                         .append("Рахунок для ")
                         .append(userDataContainer[0])
                         .append(" ")
@@ -148,7 +150,7 @@ public class AdminService implements AdminServiceInterface {
                                                 .append(userDataContainer[1])
                                                 .append(" has been successfully changed;"));
             } else {
-                response
+                response.append("WARN: ")
                         .append("Користувач з іменем ")
                         .append(userDataContainer[0])
                         .append(" ")
@@ -210,6 +212,13 @@ public class AdminService implements AdminServiceInterface {
             throw new NoSuchElementException("Такого користувача не знайдено!");
         }
 
+        Optional<User> userForCheckOpt = adminRepository.findByFirstNameAndLastNameIgnoreCase(updatedUser.getFirstName().trim(), updatedUser.getLastName());
+        if(userForCheckOpt.isPresent()) {
+            String response = "METHOD CREATE: The user with firstName: " + updatedUser.getFirstName().trim() + " and lastName: " + updatedUser.getLastName() + " already exist";
+            LOGGER.warn(response);
+            return userForCheckOpt.get();
+        }
+
         User userForUpdate = userForUpdateOpt.get();
         userForUpdate.setFirstName(updatedUser.getFirstName().trim());
         userForUpdate.setLastName(updatedUser.getLastName().trim());
@@ -264,10 +273,20 @@ public class AdminService implements AdminServiceInterface {
         return response.toString();
     }
     @Override
-    public List<String> getLogs() throws IOException {
+    public List<String> getLogs(int amountOfLogs) throws IOException {
         List<String> response = new ArrayList<>();
+        //TODO: check path on production
         Path path = Paths.get("logs/ProjectLog.log");
         Files.readAllLines(path).forEach(str -> response.add(str));
+        if(amountOfLogs == 0) {
+            return response;
+        }
+        if(amountOfLogs < response.size()) {
+            for(int i = response.size() - amountOfLogs; i > 0; i--) {
+                response.remove(0);
+            }
+        }
         return response;
     }
+
 }

@@ -32,9 +32,11 @@ class MainPageContainer extends React.Component {
         this.props.dispatch(setNews(representation.newsList));
         this.props.dispatch(setFiles(representation.fileList, "block"));
         if(representation.authorizedUser){
-          this.props.dispatch(setIsAuthenticated(true, representation.authorizedUser));
           if(representation.authorizedUser.roles.includes("ADMINISTRATOR")) {
+            this.props.dispatch(setIsAuthenticated(true, representation.authorizedUser, true));
             this.props.dispatch(setAdminDisplayMode("block"));
+          } else {
+            this.props.dispatch(setIsAuthenticated(true, representation.authorizedUser, false));
           }
         }
       }).then(() => {

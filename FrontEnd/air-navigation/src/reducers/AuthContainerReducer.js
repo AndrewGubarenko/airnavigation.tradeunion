@@ -6,10 +6,9 @@ let startState = {
 
 const authContainerReducer = (state = startState, action) => {
   if(action.type === SET_IS_AUTH_CONTAINER_VISIBLE) {
-    return {
-      ...state,
-      isAuthVisible: action.isAuthVisible
-    };
+    return Object.assign({}, state, {
+            isAuthVisible: action.isAuthVisible
+        })
   }
   return state;
 };

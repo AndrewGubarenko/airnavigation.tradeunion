@@ -129,8 +129,8 @@ export default class AdminService {
   }
   /*Update counts by file*/
   /*Logs*/
-  getLogs() {
-    return fetch(this.startUrl + "/logs", {
+  getLogs(numberOfLogs) {
+    return fetch(this.startUrl + "/logs/" + numberOfLogs, {
       method: "get"
     });
   }
