@@ -29,6 +29,7 @@ class AdminPage extends React.Component {
             </div>
             <div className="interactive_button_container" style={{display: this.props.fileBtnContainerDisplay}}>
               <button className="admin_screen_btn" onClick={this.props.onClickAddFile}>Add file</button>
+              <button className="admin_screen_btn" onClick={this.props.onClickGetCategories}>Get cats</button>
             </div>
 
 {/*user panels*/}
@@ -135,6 +136,17 @@ class AdminPage extends React.Component {
               <div className="interactive_control_panel_row">
                 <span>Path: </span><input className="terminal_input" onChange={this.props.onChangeFilePath} value={this.props.file.path} style={{borderBottomColor: this.props.borderColorPath}}/>
               </div>
+              <div className="interactive_control_panel_row">
+                <span>Category: </span><input className="terminal_input" onChange={this.props.onChangeFileCategory} value={this.props.file.category.name} style={{borderBottomColor: this.props.borderColorCategory}}/>
+              </div>
+              <div className="interactive_control_panel_row">
+                <span>SubCategory: </span><input className="terminal_input" onChange={this.props.onChangeFileSubCategory} value={this.props.file.subCategory} style={{borderBottomColor: this.props.borderColorSubCategory}}/>
+              </div>
+              <div className="interactive_control_panel_row">
+                <span>Or choose: </span>{this.props.selection}
+
+              </div>
+
               <button className="admin_screen_btn" onClick={this.props.onClickCreateFile}>Add file</button>
             </div>
 
@@ -144,6 +156,15 @@ class AdminPage extends React.Component {
               </div>
               <div className="interactive_control_panel_row">
                 <span>Path: </span><input className="terminal_input" onChange={this.props.onChangeFilePath} value={this.props.file.path} style={{borderBottomColor: this.props.borderColorPath}}/>
+              </div>
+              <div className="interactive_control_panel_row">
+                <span>Category: </span><input className="terminal_input" onChange={this.props.onChangeFileCategory} value={this.props.file.category.name} style={{borderBottomColor: this.props.borderColorCategory}}/>
+              </div>
+              <div className="interactive_control_panel_row">
+                <span>SubCategory: </span><input className="terminal_input" onChange={this.props.onChangeFileSubCategory} value={this.props.file.subCategory} style={{borderBottomColor: this.props.borderColorSubCategory}}/>
+              </div>
+              <div className="interactive_control_panel_row">
+                <span>Or choose: </span>{this.props.selection}
               </div>
               <div>
                 <button className="admin_screen_btn" onClick={this.props.onClickChangeFile}>Update file</button>
@@ -157,6 +178,24 @@ class AdminPage extends React.Component {
               </div>
             </div>
 
+            <div className="interactive_control_panel" style={{display: this.props.categoriesUpdateControlPanelDisplay}}>
+              <div className="interactive_control_panel_row">
+                <span>Cat Name: </span><input className="terminal_input" onChange={this.props.onChangeCatName} value={this.props.category.name} style={{borderBottomColor: this.props.borderColorCatName}}/>
+              </div>
+              <div className="interactive_control_panel_row">
+                <span>Sub cats: </span><div  style={{display: "flex", flexDirection: "column", textAlign: "left"}}>{this.props.subCats}</div>
+              </div>
+              <div>
+                <button className="admin_screen_btn" onClick={this.props.onClickUpdateCat}>Update cat</button>
+              </div>
+              <div style={{display: this.props.DeleteCategoryButtonDisplay}}>
+                <button className="admin_screen_btn" onClick={this.props.onClickDeleteCategory} style={{color: "red"}}>Delete cat</button>
+              </div>
+              <div style={{display: this.props.DeleteCategoryYesNoContainerDisplay}}>
+                <button className="admin_screen_btn" onClick={this.props.onClickCategoryDeleteYes} style={{color: "red"}}>Yes</button>
+                <button className="admin_screen_btn" onClick={this.props.onClickCategoryDeleteNo} >No</button>
+              </div>
+            </div>
 {/*files panels*/}
 
 {/*logs panels*/}

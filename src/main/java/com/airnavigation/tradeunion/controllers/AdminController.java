@@ -156,9 +156,9 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PutMapping(path = "/category")
-    public ResponseEntity<Category> updateCategory(@RequestBody Map<String, String> categoryNames) {
-        Category response = fileService.updateCategoryName(categoryNames);
+    @PutMapping(path = "/category/{id}")
+    public ResponseEntity<Category> updateCategory(@PathVariable long id, @RequestBody String categoryName) {
+        Category response = fileService.updateCategoryName(categoryName, id);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -168,8 +168,8 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @DeleteMapping(path = "/category/{name}")
-    public ResponseEntity<String> deleteCategory(@PathVariable String name) {
+    @DeleteMapping(path = "/category")
+    public ResponseEntity<String> deleteCategory(@RequestBody String name) {
         String response = fileService.deleteCategory(name);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

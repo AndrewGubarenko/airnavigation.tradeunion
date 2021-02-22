@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
 
+import javax.mail.MessagingException;
 import javax.persistence.NonUniqueResultException;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -52,7 +53,7 @@ public class CustomSpringExceptionHandler extends ExceptionHandlerExceptionResol
     @ExceptionHandler
     public ResponseEntity<String> onWrongMediaTypeException(HttpMediaTypeNotSupportedException ex) {
         return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(new StringBuilder()
-                .append("ОТ ХАЛЕПА! Щось не так з media type нашого файлу! Нам потрібен файл EXCEL з корректним розширенням!")
+                .append("ОТ ХАЛЕПА! Щось не так з media type вашого файлу!")
                 .append("\n")
                 .append(ex.fillInStackTrace().getMessage())
                 .toString());
@@ -169,6 +170,14 @@ public class CustomSpringExceptionHandler extends ExceptionHandlerExceptionResol
     public ResponseEntity<String> onNonUniqueResultException(NonUniqueResultException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new StringBuilder()
                 .append("ОТ ХАЛЕПА! Duplicate firstName and lastName in DB")
+                .append(ex.fillInStackTrace().getMessage())
+                .toString());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> onMessagingException(MessagingException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StringBuilder()
+                .append("ОТ ХАЛЕПА! Неможливо відправити листа!")
                 .append(ex.fillInStackTrace().getMessage())
                 .toString());
     }

@@ -80,4 +80,5 @@ public interface AdminServiceInterface {
      * @throws IOException
      */
     List<String> getLogs(int amountOfLogs) throws IOException;
+
 }

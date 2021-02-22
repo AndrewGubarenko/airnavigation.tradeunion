@@ -52,6 +52,29 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Questionnaire questionnaire;
+
+    public void addQuestionnaire(Questionnaire questionnaire, boolean otherSideHasBeenAlreadySet) {
+        this.setQuestionnaire(questionnaire);
+        if (otherSideHasBeenAlreadySet) {
+            return;
+        }
+        questionnaire.addUser(this, true);
+    }
+
+    public void removeQuestionnaire() {
+        removeQuestionnaire(this.questionnaire, false);
+    }
+
+    protected void removeQuestionnaire(Questionnaire questionnaire, boolean otherSideHasBeenSet) {
+        this.questionnaire = null;
+        if(otherSideHasBeenSet) {
+            return;
+        }
+        questionnaire.removeUser(true);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

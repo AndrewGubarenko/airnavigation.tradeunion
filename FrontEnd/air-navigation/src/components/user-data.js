@@ -32,19 +32,29 @@ class UserData extends React.Component {
             <img id="user-icon-image" src={this.getGender()} alt=""/>
           </div>
 
-          <div className="user-profile-container">
-            <div className="user-data-container">
-              <p id="user__name">{this.props.firstName} {this.props.lastName}</p>
-              <p id="user__count">на Вашому рахунку:
-                <br/>
-                {this.props.count} грн.
-              </p>
-            </div>
-            <Link id="password__change__button" to="/change_password">
-              <img id="password__change__button__img" src={CHANGE_PASSWORD_BTN} alt=""/>
-            </Link>
+          <div className="user-data-container">
+            <p id="user__name">{this.props.firstName} {this.props.lastName}</p>
+          </div>
+          <div className="user-data-container">
+            <p id="user__count">на Вашому рахунку:
+              <br/>
+              {this.props.count} грн.
+            </p>
           </div>
         </div>
+
+        <div className="user-container">
+          <Link className="password__change__button" to="/change_password">
+            <img className="password__change__button__img" src={CHANGE_PASSWORD_BTN} alt=""/>
+          </Link>
+          <Link className="password__change__button" to="/feedback">
+            <img className="password__change__button__img" src={CHANGE_PASSWORD_BTN} alt=""/>
+          </Link>
+          <Link className="password__change__button" to="/questionnaire">
+            <img className="password__change__button__img" src={CHANGE_PASSWORD_BTN} alt=""/>
+          </Link>
+        </div>
+
       </div>
     );
   }

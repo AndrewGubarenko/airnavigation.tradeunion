@@ -1,7 +1,10 @@
 .footer-container {
-  height: 30px;
+  min-height: 30px;
   padding: 20px;
   background-color: #09173f;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .copyright {
@@ -9,6 +12,12 @@
   color: white;
   width: auto;
   margin: auto 0;
+  text-align: center;
+}
+
+.feedback {
+  color: white;
+  text-decoration: none;
 }
 
 @media (max-width: 1199px) {
@@ -18,7 +27,7 @@
 
 }
 @media (max-width: 899px) {
-  .copyright {
+  .copyright, .feedback {
     font-size: 14px;
   }
 }
@@ -32,9 +41,7 @@
   }
 }
 @media (max-width: 349px) {
-  .copyright {
-    text-align: center;
-  }
+
 }
 @media (max-width: 219px) {
 

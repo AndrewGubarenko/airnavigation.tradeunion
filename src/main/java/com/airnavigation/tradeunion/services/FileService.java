@@ -4,6 +4,7 @@ import com.airnavigation.tradeunion.Repositories.CategoryRepository;
 import com.airnavigation.tradeunion.Repositories.FilesRepository;
 import com.airnavigation.tradeunion.domain.Category;
 import com.airnavigation.tradeunion.domain.File;
+import com.airnavigation.tradeunion.exceptions.EmptyDataFieldsException;
 import com.airnavigation.tradeunion.exceptions.IllegalAccessAttemtException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,26 +119,29 @@ public class FileService {
 
     @Transactional
     @PreAuthorize("hasRole('ADMINISTRATOR')")
-    public Category updateCategoryName(Map<String, String> categoryNames) {
-        String oldCategoryName = categoryNames.get("oldCategoryName");
-        String newCategoryName = categoryNames.get("newCategoryName");
+    public Category updateCategoryName(String newCatName, long id) {
+        if(newCatName == null
+                || newCatName.substring(1, newCatName.length() - 1).trim().isEmpty()) {
+            LOGGER.warn("METHOD UPDATE_CATEGORY: The category name field is empty!");
+            throw new EmptyDataFieldsException("The category name field is empty!");
+        }
         StringBuilder loggerResponse = new StringBuilder();
-        Optional<Category> resultOpt = categoryRepository.findByName(oldCategoryName.trim().toUpperCase());
+        Optional<Category> resultOpt = categoryRepository.findById(id);
         if(resultOpt.isPresent()) {
             Category category = resultOpt.get();
-            category.setName(newCategoryName.trim().toUpperCase());
+            category.setName(newCatName.trim().toUpperCase().substring(1, newCatName.length() - 1));
             categoryRepository.save(category);
-            loggerResponse.append("Category ")
-                    .append(oldCategoryName)
+            loggerResponse.append("The name of category with id: ")
+                    .append(id)
                     .append(" has been changed to ")
-                    .append(newCategoryName)
+                    .append(newCatName)
                     .append(".");
             LOGGER.info(loggerResponse);
             return category;
         } else {
-            loggerResponse.append("Category ")
-                    .append(oldCategoryName)
-                    .append(" was not found.");
+            loggerResponse.append("Category with id")
+                    .append(id)
+                    .append(" has been not found.");
             LOGGER.warn(loggerResponse);
             throw new NoSuchElementException(loggerResponse.toString());
         }
@@ -174,7 +178,8 @@ public class FileService {
                 }
                 response.append(" remove them or change it's subCategory before removing subCategory.");
                 if(isReadyForRemove != 0) {
-                    return response.toString();
+                    LOGGER.warn(response);
+                    throw new IllegalAccessAttemtException(response.toString());
                 } else {
                     return new StringBuilder().append("SubCategory ").append(subCategoryName.trim().toLowerCase()).append(" was removed.").toString();
                 }
@@ -184,14 +189,14 @@ public class FileService {
                     .append(categoryName)
                     .append(" was not found.");
             LOGGER.warn(response);
-            return response.toString();
+            throw new NoSuchElementException(response.toString());
         }
     }
 
     @Transactional
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     public String deleteCategory(String categoryName) {
-        Optional<Category> resultOpt = categoryRepository.findByName(categoryName.trim().toUpperCase());
+        Optional<Category> resultOpt = categoryRepository.findByName(categoryName.trim().toUpperCase().substring(1, categoryName.length() - 1));
         Category result;
         if(resultOpt.isPresent()) {
             result = resultOpt.get();

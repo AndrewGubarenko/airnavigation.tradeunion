@@ -1,6 +1,8 @@
 package com.airnavigation.tradeunion.controllers;
 
 import com.airnavigation.tradeunion.domain.PlainDomain.ChangePassword;
+import com.airnavigation.tradeunion.domain.PlainDomain.Feedback;
+import com.airnavigation.tradeunion.domain.Questionnaire;
 import com.airnavigation.tradeunion.domain.User;
 import com.airnavigation.tradeunion.services.interfaces.UserServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,4 +39,22 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.changePassword(changePassword, id));
     }
 
+    /**
+     * Controller for getting a feedback from user
+     */
+    @PostMapping(path = "/feedback", consumes = "application/json")
+    public ResponseEntity<String> getEmail (@RequestBody Feedback feedback) {
+        String result = userService.receiveEmailFromUser(feedback);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
+    /**
+     * email service
+     */
+    @PostMapping(path = "/{id}/questionnaire", consumes = "application/json")
+    public ResponseEntity<Questionnaire> saveQuestionnaire (@RequestBody Questionnaire questionnaire,
+                                                            @PathVariable long id) {
+        Questionnaire result = userService.saveQuestionnaire(id, questionnaire);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
 }

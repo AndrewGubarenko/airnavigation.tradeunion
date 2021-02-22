@@ -40,8 +40,8 @@ class MainPageContainer extends React.Component {
           }
         }
       }).then(() => {
-        this.setFilesContainer()
         this.setNews();
+        this.setFilesContainer()
       });
     } else {
       representationService.getTruncatedMain().then((data) =>  data.json()).then(representation => {

@@ -168,9 +168,15 @@
   }
 }
 @media (max-width: 549px) {
-  .menu-li {
-    margin: 0 0 0 15px;
-    font-size: 13px;
+  .menu-ul {
+    display: none;
+  }
+  .navigation_burger_menu {
+    display: block;
+  }
+  .burget_menu_li {
+    font-size: 18px;
+    line-height: 2em;
   }
   #logo {
     width: 90px;
@@ -189,16 +195,7 @@
   }
 }
 @media (max-width: 399px) {
-  .menu-ul {
-    display: none;
-  }
-  .navigation_burger_menu {
-    display: block;
-  }
-  .burget_menu_li {
-    font-size: 18px;
-    line-height: 2em;
-  }
+
 }
 @media (max-width: 349px) {
   #logo {

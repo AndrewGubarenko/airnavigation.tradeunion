@@ -112,6 +112,38 @@ export default class AdminService {
       method: "get"
     });
   }
+  getCategoriesList(){
+    return fetch(this.startUrl + "/category_list", {
+      method: "get"
+    });
+  }
+  deleteSubCategory(categoryNames){
+    return fetch(this.startUrl + "/sub_category", {
+      method: "delete",
+      body: JSON.stringify(categoryNames),
+      headers: new Headers({
+        "Content-type": "application/json;chartSet=UTF-8"
+      })
+    });
+  }
+  updateCategory(catName, catId) {
+    return fetch(this.startUrl + "/category/" + catId, {
+      method: "put",
+      body: JSON.stringify(catName),
+      headers: new Headers({
+        "Content-type": "application/json;chartSet=UTF-8"
+	    })
+    });
+  }
+  deleteCategory(categoryName){
+    return fetch(this.startUrl + "/category", {
+      method: "delete",
+      body: JSON.stringify(categoryName),
+      headers: new Headers({
+        "Content-type": "application/json;chartSet=UTF-8"
+      })
+    });
+  }
   /*Lists*/
   /*Update counts by file*/
   updateCounts(selectedCountFile) {

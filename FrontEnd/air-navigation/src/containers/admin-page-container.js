@@ -10,7 +10,6 @@ class AdminPageContainer extends React.Component {
 
   constructor(props) {
     super(props);
-
     this.state = {
       username: "",
       user: {
@@ -30,10 +29,20 @@ class AdminPageContainer extends React.Component {
       file: {
         id: "",
         name: "",
-        path: ""
+        path: "",
+        category: {
+          name: ""
+        },
+        subCategory: ""
+      },
+      category: {
+        id: "",
+        name: "",
+        subCategories: []
       },
       newsList: [],
       filesList: [],
+      selection: [],
       logs: "",
       amountOfLogs: 0,
       selectedCountFile: null,
@@ -54,8 +63,11 @@ class AdminPageContainer extends React.Component {
       filesUpdateControlPanelDisplay: "none",
       DeleteFileButtonDisplay: "none",
       DeleteFileYesNoContainerDisplay: "none",
+      DeleteCategoryButtonDisplay: "none",
+      DeleteCategoryYesNoContainerDisplay: "none",
       XMLCountUodateControlPanelDisplay: "none",
       XMLDatabaseUpdateControlPanelDisplay: "none",
+      categoriesUpdateControlPanelDisplay: "none",
       logsControlPanelDisplay: "none",
       selected: "MALE",
       checked: false,
@@ -67,12 +79,16 @@ class AdminPageContainer extends React.Component {
       borderColorText: "darkgrey",
       borderColorName: "darkgrey",
       borderColorPath: "darkgrey",
+      borderColorCategory: "darkgrey",
+      borderColorSubCategory: "darkgrey",
+      borderColorCatName: "darkgrey",
       fileInputColor: "red",
       terminalData: ""
     };
   }
 
   componentDidMount() {
+    this.setSelection();
     this.props.dispatch(setToMainDisplayMode("block"));
     this.props.dispatch(setSpinnerVisibility("none"));
   }
@@ -98,7 +114,16 @@ class AdminPageContainer extends React.Component {
                       file: {
                         id: "",
                         name: "",
-                        path: ""
+                        path: "",
+                        category: {
+                          name: ""
+                        },
+                        subCategory: ""
+                      },
+                      category: {
+                        id: "",
+                        name: "",
+                        subCategories: []
                       },
                       newsList: [],
                       filesList: [],
@@ -122,9 +147,12 @@ class AdminPageContainer extends React.Component {
                       filesUpdateControlPanelDisplay: "none",
                       DeleteFileButtonDisplay: "none",
                       DeleteFileYesNoContainerDisplay: "none",
+                      DeleteCategoryButtonDisplay: "none",
+                      DeleteCategoryYesNoContainerDisplay: "none",
                       XMLCountUodateControlPanelDisplay: "none",
                       XMLDatabaseUpdateControlPanelDisplay: "none",
                       logsControlPanelDisplay: "none",
+                      categoriesUpdateControlPanelDisplay: "none",
                       selected: "MALE",
                       checked: false,
                       borderColorUsername: "darkgrey",
@@ -135,6 +163,9 @@ class AdminPageContainer extends React.Component {
                       borderColorText: "darkgrey",
                       borderColorName: "darkgrey",
                       borderColorPath: "darkgrey",
+                      borderColorCategory: "darkgrey",
+                      borderColorSubCategory: "darkgrey",
+                      borderColorCatName: "darkgrey",
                       fileInputColor: "red",
                       terminalData: ""
                     });
@@ -266,8 +297,8 @@ class AdminPageContainer extends React.Component {
     this.setState({DeleteUserYesNoContainerDisplay: "block"})
   }
   onClickDeleteYes = () => {
-    adminService.deleteUser(this.state.user.id).then(responce => {
-      return responce.text()
+    adminService.deleteUser(this.state.user.id).then(response => {
+      return response.text()
     }).then(data => {
       this.setState({terminalData: data});
     }).then(() => {
@@ -342,8 +373,8 @@ class AdminPageContainer extends React.Component {
     this.setState({DeleteNewsYesNoContainerDisplay: "block"});
   }
   onClickNewsDeleteYes = () => {
-    adminService.deleteNews(this.state.news.id).then(responce => {
-      return responce.text()
+    adminService.deleteNews(this.state.news.id).then(response => {
+      return response.text()
     }).then(data => {
       this.setState({terminalData: data});
     }).then(() => {
@@ -368,25 +399,178 @@ class AdminPageContainer extends React.Component {
     file.path = event.target.value;
     this.setState({file: file});
   }
+  onChangeFileCategory = (event) => {
+    this.setState({borderColorCategory: "darkgrey"});
+    const file = this.state.file;
+    const category = file.category;
+    category.name = event.target.value;
+    this.setState({file: file});
+  }
+  onChangeFileSubCategory = (event) => {
+    this.setState({borderColorSubCategory: "darkgrey"});
+    const file = this.state.file;
+    file.subCategory = event.target.value;
+    this.setState({file: file});
+  }
+
+  onChangeFileCategoryAndSubcategory = (event) => {
+    let index = event.target.selectedIndex;
+    let element = event.target[index];
+    let categoryName =  element.getAttribute('category');
+    const file = this.state.file;
+    let category = {name: categoryName};
+    file.category = category;
+    file.subCategory = event.target.value;
+    this.setState({file: file});
+  }
+
+  onChangeCatName = (event) => {
+    this.setState({borderColorCatName: "darkgrey"});
+    const category = this.state.category;
+    category.name = event.target.value;
+    this.setState({ficategoryle: category});
+  }
+
+  setSelection = () => {
+    adminService.getCategoriesList().then(response => {
+      response.json().then(categories => {
+        let selection = categories.map(category => {
+          let subCats = category.subCategories.map(subCategory => {
+             return(
+              <option key={subCategory}
+                      category={category.name}
+                      value={subCategory}>{subCategory}</option>
+              )
+            })
+          return (
+            <optgroup key={category.id} label={category.name}>
+              {subCats}
+            </optgroup>
+          )
+        });
+        let selectionContainer = <select id="select" className="terminal_input_select" onChange={this.onChangeFileCategoryAndSubcategory}>
+          <option category="" value=""/>
+          {selection}
+        </select>
+        this.setState({selection: selectionContainer});
+      });
+    });
+  }
+
+  onClickGetCategories = async () => {
+    this.clearState();
+    this.props.dispatch(setSpinnerVisibility("inline-block"));
+    await adminService.getCategoriesList().then(response => {
+      if(response.ok) {
+          return response.json().then(data => {
+          this.createCategoriesListForPrint(data);
+        });
+      } else {
+        return response.text().then(error => {this.setState({terminalData: error})});
+      }
+    });
+    this.props.dispatch(setSpinnerVisibility("none"));
+  }
+
+  getSubCats = () => {
+    let subCats = this.state.category.subCategories;
+    return(
+      subCats.map(subCat => {
+        let categoryNames = {
+          categoryName: this.state.category.name,
+          subCategoryName: subCat
+        };
+        return(
+          <div key={subCat}>
+            <span style={{color: "#181818"}}> {subCat} </span> <button className="admin_screen_btn" onClick={() => {
+              adminService.deleteSubCategory(categoryNames).then((response) => {
+                if(response.ok) {
+                  const category = this.state.category;
+                  const index = category.subCategories.indexOf(subCat);
+                  if (index > -1) {
+                    category.subCategories.splice(index, 1);
+                  }
+                  this.setState({category: category});
+                  this.setSelection();
+                  this.getSubCats();
+                  response.text().then(error => {this.setState({terminalData: error})});
+                } else {
+                  return response.text().then(error => {this.setState({terminalData: error})});
+                }
+              })
+            }} style={{color: "red", margin: "0"}}>Del subCat</button>
+          </div>
+        );
+      })
+    )
+  }
+
+  onClickUpdateCat = () => {
+    if(this.state.category.name.trim() === "") {
+      this.setState({borderColorCatName: "red"});
+    } else {
+      let category = this.state.category;
+      this.props.dispatch(setSpinnerVisibility("inline-block"));
+      adminService.updateCategory(category.name, category.id).then(response => {
+        if(response.ok) {
+          return response.json().then(category => {
+            this.setState({category: category});
+            this.setState({terminalData: JSON.stringify(category)});
+            this.setSelection();
+          });
+        } else {
+          return response.text().then(error => {this.setState({terminalData: error})});
+        }
+      });
+      this.props.dispatch(setSpinnerVisibility("none"));
+    }
+  }
+
+  onClickDeleteCategory = () => {
+    this.setState({DeleteCategoryButtonDisplay: "none"});
+    this.setState({DeleteCategoryYesNoContainerDisplay: "block"});
+  }
+  onClickCategoryDeleteYes = () => {
+    this.clearState();
+    this.props.dispatch(setSpinnerVisibility("inline-block"));
+    adminService.deleteCategory(this.state.category.name).then(response => {
+      if(response.ok) {
+        return response.text().then(response => {this.setState({terminalData: response})});
+      } else {
+        return response.text().then(error => {this.setState({terminalData: error})});
+      }
+    });
+    this.props.dispatch(setSpinnerVisibility("none"));
+  }
+  onClickCategoryDeleteNo = () => {
+    this.setState({DeleteCategoryButtonDisplay: "block"});
+    this.setState({DeleteCategoryYesNoContainerDisplay: "none"});
+  }
+
   onClickAddFile = () => {
     this.setState({fileBtnContainerDisplay: "none"});
     this.setState({filesControlPanelDisplay: "block"});
   }
 
   onClickCreateFile = () => {
-    if(this.state.file.name === "") {
+    if(this.state.file.name.trim() === "") {
       this.setState({borderColorName: "red"});
-    } else if(this.state.file.path === "") {
+    } else if(this.state.file.path.trim() === "") {
       this.setState({borderColorPath: "red"});
+    } else if(this.state.file.category.name.trim() === "") {
+      this.setState({borderColorCategory: "red"});
+    } else if(this.state.file.subCategory.trim() === "") {
+      this.setState({borderColorSubCategory: "red"});
     } else {
       adminService.createFile(this.state.file).then(response => {
         if(response.ok) {
           return response.json().then(data => {
-            this.setState({file: data})
+            this.setState({file: data});
             this.setState({filesControlPanelDisplay: "none"});
             this.setState({filesUpdateControlPanelDisplay: "block"});
             this.setState({DeleteFileButtonDisplay: "block"});
             this.setState({terminalData: JSON.stringify(data)});
+            this.setSelection();
           });
         } else {
           return response.text().then(error => {this.setState({terminalData: error})});
@@ -396,16 +580,21 @@ class AdminPageContainer extends React.Component {
   }
 
   onClickChangeFile = () => {
-    if(this.state.file.name === "") {
+    if(this.state.file.name.trim() === "") {
       this.setState({borderColorName: "red"});
-    } else if(this.state.file.path === "") {
+    } else if(this.state.file.path.trim() === "") {
       this.setState({borderColorPath: "red"});
+    } else if(this.state.file.category.name.trim() === "") {
+      this.setState({borderColorCategory: "red"});
+    } else if(this.state.file.subCategory.trim() === "") {
+      this.setState({borderColorSubCategory: "red"});
     } else {
       adminService.updateFile(this.state.file).then(response => {
         if(response.ok) {
           return response.json().then(data => {
             this.setState({file: data});
             this.setState({terminalData: JSON.stringify(data)});
+            this.setSelection();
           });
         } else {
           return response.text().then(error => {this.setState({terminalData: error})});
@@ -419,10 +608,11 @@ class AdminPageContainer extends React.Component {
     this.setState({DeleteFileYesNoContainerDisplay: "block"});
   }
   onClickFileDeleteYes = () => {
-    adminService.deleteFile(this.state.file.id).then(responce => {
-      return responce.text();
+    adminService.deleteFile(this.state.file.id).then(response => {
+      return response.text();
     }).then(data => {
       this.setState({terminalData: data});
+      this.setSelection();
     }).then(() => {
       this.setState({filesUpdateControlPanelDisplay: "none"});
     });
@@ -516,6 +706,39 @@ class AdminPageContainer extends React.Component {
                         await this.setState({file: item});
                         this.setState({filesUpdateControlPanelDisplay: "block"});
                         this.setState({DeleteFileButtonDisplay: "block"});
+                        scroller.scrollTo("interactive_screen", {
+                          spy: true,
+                          smooth: true,
+                          offset:-300,
+                          duration: 500
+                        });
+                      }}>
+                      <pre>{++count}) {JSON.stringify(item)}</pre>
+                    </div>
+                  );
+                })
+              }
+          </div>
+      );
+    } else {
+      terminalData = "No files found";
+    }
+    this.setState({terminalData: terminalData});
+  }
+
+  createCategoriesListForPrint = (list) => {
+    let terminalData;
+    if (Array.isArray(list) && list.length) {
+      let count = 0;
+      terminalData = (
+          <div>
+              {
+                list.map(item => {
+                  return(
+                    <div key={item.id} className="admin_result_list_item" style={{cursor: "pointer"}} onClick={async() => {
+                        await this.setState({category: item});
+                        this.setState({categoriesUpdateControlPanelDisplay: "block"});
+                        this.setState({DeleteCategoryButtonDisplay: "block"});
                         scroller.scrollTo("interactive_screen", {
                           spy: true,
                           smooth: true,
@@ -729,9 +952,12 @@ class AdminPageContainer extends React.Component {
         user={this.state.user}
         news={this.state.news}
         file={this.state.file}
+        category={this.state.category}
+        subCats={this.getSubCats()}
         selected={this.state.selected}
         checked={this.state.checked}
         amountOfLogs={this.state.amountOfLogs}
+        selection={this.state.selection}
 
         userBtnContainerDisplay={this.state.userBtnContainerDisplay}
         newsBtnContainerDisplay={this.state.newsBtnContainerDisplay}
@@ -749,7 +975,10 @@ class AdminPageContainer extends React.Component {
         filesUpdateControlPanelDisplay={this.state.filesUpdateControlPanelDisplay}
         DeleteFileButtonDisplay={this.state.DeleteFileButtonDisplay}
         DeleteFileYesNoContainerDisplay={this.state.DeleteFileYesNoContainerDisplay}
+        DeleteCategoryButtonDisplay={this.state.DeleteCategoryButtonDisplay}
+        DeleteCategoryYesNoContainerDisplay={this.state.DeleteCategoryYesNoContainerDisplay}
         logsControlPanelDisplay={this.state.logsControlPanelDisplay}
+        categoriesUpdateControlPanelDisplay={this.state.categoriesUpdateControlPanelDisplay}
 
         borderColorUsername={this.state.borderColorUsername}
         borderColorFirstName={this.state.borderColorFirstName}
@@ -759,6 +988,9 @@ class AdminPageContainer extends React.Component {
         borderColorText={this.state.borderColorText}
         borderColorName={this.state.borderColorName}
         borderColorPath={this.state.borderColorPath}
+        borderColorCategory={this.state.borderColorCategory}
+        borderColorSubCategory={this.state.borderColorSubCategory}
+        borderColorCatName={this.state.borderColorCatName}
 
         onClickUser={this.onClickUser}
         onClickNews={this.onClickNews}
@@ -794,12 +1026,21 @@ class AdminPageContainer extends React.Component {
 
         onChangeFileName={this.onChangeFileName}
         onChangeFilePath={this.onChangeFilePath}
+        onChangeFileCategory={this.onChangeFileCategory}
+        onChangeFileSubCategory={this.onChangeFileSubCategory}
+        onChangeFileCategoryAndSubcategory={this.onChangeFileCategoryAndSubcategory}
+        onChangeCatName={this.onChangeCatName}
         onClickCreateFile={this.onClickCreateFile}
         onClickAddFile={this.onClickAddFile}
         onClickChangeFile={this.onClickChangeFile}
         onClickDeleteFile={this.onClickDeleteFile}
         onClickFileDeleteYes={this.onClickFileDeleteYes}
         onClickFileDeleteNo={this.onClickFileDeleteNo}
+        onClickGetCategories={this.onClickGetCategories}
+        onClickUpdateCat={this.onClickUpdateCat}
+        onClickDeleteCategory={this.onClickDeleteCategory}
+        onClickCategoryDeleteYes={this.onClickCategoryDeleteYes}
+        onClickCategoryDeleteNo={this.onClickCategoryDeleteNo}
 
         onClickSingleNew={this.onClickSingleNew}
 

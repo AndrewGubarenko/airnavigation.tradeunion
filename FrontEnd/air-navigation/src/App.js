@@ -10,6 +10,8 @@ import SingleNewContainer from './containers/SingleNewContainer';
 import AdminPageContainer from './containers/admin-page-container';
 import SpinnerContainer from './containers/spinner-container';
 import GoUpButtonContainer from './containers/GoUpButtonContainer';
+import FeedbackContainer from './containers/feedbackContainer';
+import QuestionnaireContainer from './containers/questionnaire_container';
 import './App.css';
 import {Provider} from 'react-redux';
 import {store, persistor} from './reducers/store';
@@ -47,6 +49,22 @@ class App extends Component {
             <Route path="/change_password" render={()=>{
                 if(this.state.isAuthenticated) {
                   return(<ChangePasswordContainer/>)
+                } else {
+                  return(<Redirect to="/main"/>)
+                }
+              }
+            }/>
+            <Route path="/feedback" render={()=>{
+                if(this.state.isAuthenticated) {
+                  return(<FeedbackContainer />)
+                } else {
+                  return(<Redirect to="/main"/>)
+                }
+              }
+            }/>
+           <Route path="/questionnaire" render={()=>{
+                if(this.state.isAuthenticated) {
+                  return(<QuestionnaireContainer />)
                 } else {
                   return(<Redirect to="/main"/>)
                 }

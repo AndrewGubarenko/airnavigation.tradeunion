@@ -1,6 +1,8 @@
 package com.airnavigation.tradeunion.services.interfaces;
 
 import com.airnavigation.tradeunion.domain.PlainDomain.ChangePassword;
+import com.airnavigation.tradeunion.domain.PlainDomain.Feedback;
+import com.airnavigation.tradeunion.domain.Questionnaire;
 import com.airnavigation.tradeunion.domain.User;
 
 /**
@@ -30,5 +32,20 @@ public interface UserServiceInterface {
      * @return
      */
     String resetPassword(String email);
+
+    /**
+     * Method for sending an email to administrator
+     * @param feedback
+     * @return String response
+     */
+    String receiveEmailFromUser(Feedback feedback);
+
+    /**
+     * Method for saving or changing questionnaire for user
+     * @param id
+     * @param questionnaire
+     * @return questionnaire
+     */
+    Questionnaire saveQuestionnaire(long id, Questionnaire questionnaire);
 
 }

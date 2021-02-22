@@ -52,4 +52,24 @@ export default class UserService {
   }
 
   /*security*/
+
+  sendFeedback(feedback) {
+    return fetch(this.startUrl + "/feedback", {
+      method: "post",
+      body: JSON.stringify(feedback),
+      headers: new Headers({
+        "Content-type": "application/json"
+      })
+    });
+  }
+
+  sendQuestionnaire(questionnaire, id) {
+    return fetch(this.startUrl + "/" + id + "/questionnaire", {
+      method: "post",
+      body: JSON.stringify(questionnaire),
+      headers: new Headers({
+        "Content-type": "application/json"
+      })
+    });
+  }
 }

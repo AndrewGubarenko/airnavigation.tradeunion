@@ -5,6 +5,7 @@
 @import "./styles/passwordActions.css";
 @import "./styles/singleNew.css";
 @import "./styles/adminPage.css";
+@import "./styles/react-tabs.css";
 
 @font-face {
 font-family: "Jura";

@@ -2,8 +2,10 @@
 package com.airnavigation.tradeunion.services;
 
 import com.airnavigation.tradeunion.Repositories.AdminRepository;
+import com.airnavigation.tradeunion.Repositories.QuestionnaireRepository;
 import com.airnavigation.tradeunion.domain.Gender;
 import com.airnavigation.tradeunion.domain.PlainDomain.SearchRequest;
+import com.airnavigation.tradeunion.domain.Questionnaire;
 import com.airnavigation.tradeunion.domain.Role;
 import com.airnavigation.tradeunion.domain.User;
 import com.airnavigation.tradeunion.exceptions.EmptyDataFieldsException;
@@ -20,7 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.NonUniqueResultException;
+import javax.mail.MessagingException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,6 +36,7 @@ public class AdminService implements AdminServiceInterface {
     private static final Logger LOGGER = Logger.getLogger(AdminService.class);
 
     private final AdminRepository adminRepository;
+    private final QuestionnaireRepository questionnaireRepository;
     private final FileProcessor fileProcessor;
     private final TemporaryPasswordGenerator passwordGenerator;
     private final EmailServiceImpl emailService;
@@ -42,11 +45,13 @@ public class AdminService implements AdminServiceInterface {
 
     @Autowired
     public AdminService (AdminRepository adminRepository,
+                         QuestionnaireRepository questionnaireRepository,
                          FileProcessor fileProcessor,
                          TemporaryPasswordGenerator passwordGenerator,
                          EmailServiceImpl emailService,
                          BCryptPasswordEncoder passwordEncoder) {
         this.adminRepository = adminRepository;
+        this.questionnaireRepository = questionnaireRepository;
         this.fileProcessor = fileProcessor;
         this.passwordGenerator = passwordGenerator;
         this.emailService = emailService;
@@ -63,12 +68,17 @@ public class AdminService implements AdminServiceInterface {
             throw new EmptyDataFieldsException("Поле email - порожнє!");
         }
 
+        /**
+         * For checking on unique firstName + lastName in DB
+         */
         Optional<User> userForCheckOpt = adminRepository.findByFirstNameAndLastNameIgnoreCase(user.getFirstName().trim(), user.getLastName());
         if(userForCheckOpt.isPresent()) {
             String response = "METHOD CREATE: The user with firstName: " + user.getFirstName().trim() + " and lastName: " + user.getLastName() + " already exist";
             LOGGER.warn(response);
             return userForCheckOpt.get();
         }
+
+        String password;
 
         user.setUsername(user.getUsername().trim());
         user.setFirstName(user.getFirstName().trim());
@@ -81,28 +91,36 @@ public class AdminService implements AdminServiceInterface {
         }
         if(user.getRoles() == null || user.getRoles().isEmpty()) {
             user.setRoles(new HashSet<>(Arrays.asList(Role.USER)));
-            user.setPassword(passwordEncoder.encode(passwordGenerator.generateTemporaryPassword(15)));
+            password = passwordGenerator.generateTemporaryPassword(15);
+            user.setPassword(passwordEncoder.encode(password));
             accessLevel = Role.USER.name();
         } else if(user.getRoles().contains(Role.ADMINISTRATOR)) {
-            user.setPassword(passwordEncoder.encode(passwordGenerator.generateTemporaryPassword(30)));
+            password = passwordGenerator.generateTemporaryPassword(30);
+            user.setPassword(passwordEncoder.encode(password));
             accessLevel = Role.ADMINISTRATOR.name();
         } else {
             user.getRoles().add(Role.USER);
             accessLevel = Role.USER.name();
-            user.setPassword(passwordEncoder.encode(passwordGenerator.generateTemporaryPassword(15)));
+            password = passwordGenerator.generateTemporaryPassword(15);
+            user.setPassword(passwordEncoder.encode(password));
         }
         adminRepository.save(user);
-        //TODO: Enable this module before production
-        /*emailService.sendSimpleMessage(user.getUsername(),
-                                        "Реєстрація користувача",
-                                        new StringBuilder().append("Вітаю! Вас зареєстровано на сайті профспілки Аеронавігація.\n")
-                                                           .append("Ваш тимчасовий пароль для доступу до особистого кабінету: ")
-                                                           .append(user.getPassword())
-                                                           .append("\n")
-                                                           .append("Радимо змінити цей пароль на свій власний. \n")
-                                                           .append("Також радимо використовувати надійні паролі, наприклад ті, що генеруються Google.")
-                                                           .append("Увага! Цей лист згенеровано автоматично. Не відповідайте на нього.")
-                                                .toString());*/
+        try {
+            emailService.sendMimeMessage(user.getUsername(),
+                    "Реєстрація користувача",
+                    "andrewgubarenko@gmail.com",
+                    new StringBuilder().append("<H2>Вітаю! Вас зареєстровано на сайті профспілки Аеронавігація.</H2>\n")
+                            .append("<p>Ваш тимчасовий пароль для доступу до особистого кабінету: ")
+                            .append(password)
+                            .append("</p>")
+                            .append("\n")
+                            .append("<p>Радимо змінити цей пароль на свій власний. </p>\n")
+                            .append("<p>Також радимо використовувати надійні паролі, наприклад ті, що генеруються Google.</p>")
+                            .append("<p>Увага! Цей лист згенеровано автоматично. Не відповідайте на нього.</p>").toString(),
+                    new ArrayList<>());
+        } catch (MessagingException ex) {
+            LOGGER.info("Something wrong with email. Unable to send an email to " + user.getUsername() + "\n" + ex.getLocalizedMessage());
+        }
         LOGGER.info("METHOD CREATE: User with username: " + user.getUsername() + " and access level:" + accessLevel + " was created");
         return user;
     }
@@ -212,9 +230,12 @@ public class AdminService implements AdminServiceInterface {
             throw new NoSuchElementException("Такого користувача не знайдено!");
         }
 
+        /**
+         * For checking on unique firstName + lastName in DB
+         */
         Optional<User> userForCheckOpt = adminRepository.findByFirstNameAndLastNameIgnoreCase(updatedUser.getFirstName().trim(), updatedUser.getLastName());
         if(userForCheckOpt.isPresent()) {
-            String response = "METHOD CREATE: The user with firstName: " + updatedUser.getFirstName().trim() + " and lastName: " + updatedUser.getLastName() + " already exist";
+            String response = "METHOD UPDATE: The user with firstName: " + updatedUser.getFirstName().trim() + " and lastName: " + updatedUser.getLastName() + " already exist";
             LOGGER.warn(response);
             return userForCheckOpt.get();
         }
@@ -229,7 +250,8 @@ public class AdminService implements AdminServiceInterface {
             userForUpdate.setRoles(updatedUser.getRoles());
             userForUpdate.setPassword(passwordEncoder.encode(passwordGenerator.generateTemporaryPassword(30)));
             adminRepository.save(userForUpdate);
-            /*emailService.sendSimpleMessage(user.getUsername(),
+            //TODO: repair this module
+            /*emailService.sendMimeMessage(user.getUsername(),
                                             "Встановлення рівня доступу Адміністратор",
                                             new StringBuilder().append("Ваш рівень доступу на сайті профспілки Аеронавігація було підвищено до рівня Адміністратор.\n")
                                                                .append("Ваш пароль на сайті профспілки Аеронавігація було перевстановлено.\n")
@@ -243,7 +265,8 @@ public class AdminService implements AdminServiceInterface {
         } else {
             userForUpdate.setRoles(updatedUser.getRoles());
             adminRepository.save(userForUpdate);
-            /*emailService.sendSimpleMessage(user.getUsername(),
+            //TODO: repair this module
+            /*emailService.sendMimeMessage(user.getUsername(),
                                             "Встановлення рівня доступу Адміністратор",
                                             new StringBuilder().append("Ваш рівень доступу на сайті профспілки Аеронавігація було знижено до рівня Користувач.\n")
                                                                .append("\n")
@@ -265,13 +288,17 @@ public class AdminService implements AdminServiceInterface {
                                 .append(" wasn't found"));
             throw new NoSuchElementException("Такого користувача не знайдено!");
         }
-        adminRepository.delete(userForDeleteOpt.get());
+        User userForDelete = userForDeleteOpt.get();
+        Questionnaire questionnaireForDelete = userForDelete.getQuestionnaire();
+        questionnaireRepository.delete(questionnaireForDelete);
+        adminRepository.delete(userForDelete);
         response.append("Користувача з email ")
                 .append(userForDeleteOpt.get().getUsername())
                 .append(" було успішно видалено!");
 
         return response.toString();
     }
+
     @Override
     public List<String> getLogs(int amountOfLogs) throws IOException {
         List<String> response = new ArrayList<>();

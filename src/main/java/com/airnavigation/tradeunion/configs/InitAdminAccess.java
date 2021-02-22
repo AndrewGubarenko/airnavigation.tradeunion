@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import javax.mail.MessagingException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -39,11 +41,12 @@ class InitAdminAccess {
     @PostConstruct
     @Transactional
     protected void createDefaultUsers() {
+        //TODO: Repair this row
+        String password = "123"/*passwordGenerator.generateTemporaryPassword(30)*/;
         User user = adminRepository.save(
                 //TODO: Repair this row
                 User.builder().username("123")
-                        //TODO: Repair this row
-                        .password(passwordEncoder.encode("123"/*passwordGenerator.generateTemporaryPassword(30)*/))
+                        .password(passwordEncoder.encode(password))
                         .firstName("Андрій Сергійович")
                         .lastName("Губаренко")
                         .count(0.00)
@@ -52,16 +55,22 @@ class InitAdminAccess {
                         .build()
         );
         //TODO: Enable this module before production
-        /*emailService.sendSimpleMessage(user.getUsername(),
-                                        "Реєстрація користувача",
-                                        new StringBuilder().append("Вітаю! Вас зареєстровано на сайті профспілки Аеронавігація.\n")
-                                                           .append("Ваш тимчасовий пароль для доступу до особистого кабінету: ")
-                                                           .append(user.getPassword())
-                                                           .append("\n")
-                                                           .append("Радимо змінити цей пароль на свій власний. \n")
-                                                           .append("Також радимо використовувати надійні паролі, наприклад ті, що генеруються Google.")
-                                                           .append("Увага! Цей лист згенеровано автоматично. Не відповідайте на нього.")
-                                                .toString());*/
+/*        try {
+            emailService.sendMimeMessage(user.getUsername(),
+                    "Реєстрація користувача",
+                    "andrewgubarenko@gmail.com",
+                    new StringBuilder().append("<H2>Вітаю! Вас зареєстровано на сайті профспілки Аеронавігація.</H2>\n")
+                            .append("<p>Ваш тимчасовий пароль для доступу до особистого кабінету: ")
+                            .append(password)
+                            .append("</p>")
+                            .append("\n")
+                            .append("<p>Радимо змінити цей пароль на свій власний. </p>\n")
+                            .append("<p>Також радимо використовувати надійні паролі, наприклад ті, що генеруються Google.</p>")
+                            .append("<p>Увага! Цей лист згенеровано автоматично. Не відповідайте на нього.</p>").toString(),
+                    new ArrayList<>());
+        } catch (MessagingException ex) {
+            LOGGER.info("Something wrong with email. Unable to send an email to " + user.getUsername() + "\n" + ex.getLocalizedMessage());
+        }*/
         LOGGER.info("METHOD CREATE: User with username: " + user.getUsername() + " and access level:" + Role.ADMINISTRATOR.name() + " was created");
     }
 }

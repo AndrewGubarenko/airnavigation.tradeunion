@@ -74,6 +74,19 @@
   width: 400px;
 }
 
+.terminal_input_select {
+  outline: none;
+  background: none;
+  border: none;
+  font: 1.3rem Inconsolata, monospace;
+  color: #696969;
+  width: 400px;
+}
+
+.terminal_input_select optgroup {
+  font-size: 16px;
+  width: auto;
+}
 .terminal_input_file {
   outline: none;
   background: none;
@@ -132,9 +145,10 @@ input[type=checkbox]:checked + label{
     font-size: 20px;
     line-height: 1.2em;
   }
-  .terminal_input {
+  .terminal_input, .terminal_input_select {
     width: 300px;
   }
+
   .admin_result_list_item {
     font-size: 16px;
   }
@@ -144,7 +158,7 @@ input[type=checkbox]:checked + label{
     margin-right: 10px;
     padding-left: 20;
   }
-  .admin_result_list_item {
+  .admin_result_list_item, .terminal_input_select optgroup {
     font-size: 14px;
   }
 }
@@ -159,7 +173,7 @@ input[type=checkbox]:checked + label{
     grid-template-columns: 30% 70%;
     font-size: 18px;
   }
-  .admin_result_list_item {
+  .admin_result_list_item, .terminal_input_select optgroup {
     font-size: 13px;
   }
   .terminal_input_file {
@@ -177,10 +191,10 @@ input[type=checkbox]:checked + label{
   .interactive_control_panel_row {
     font-size: 16px;
   }
-  .terminal_input {
+  .terminal_input, .terminal_input_select {
     width: 250px;
   }
-  .admin_result_list_item {
+  .admin_result_list_item, .terminal_input_select optgroup {
     font-size: 12px;
   }
   .admin_menu, .interactive_control_panel_file_upload {
@@ -198,7 +212,7 @@ input[type=checkbox]:checked + label{
     justify-content: flex-start;
     text-align: left;
   }
-  .terminal_input {
+  .terminal_input, .terminal_input_select {
     width: auto;
   }
   .admin_menu, .interactive_control_panel_file_upload, .terminal_input_file {
@@ -220,7 +234,7 @@ input[type=checkbox]:checked + label{
     font-size: 12px;
     width: 90px;
   }
-  .admin_result_list_item {
+  .admin_result_list_item, .terminal_input_select optgroup {
     font-size: 10px;
   }
   .admin_menu, .interactive_control_panel_file_upload, .terminal_input_file {
@@ -228,7 +242,7 @@ input[type=checkbox]:checked + label{
   }
 }
 @media (max-width: 219px) {
-  .admin_result_list_item {
+  .admin_result_list_item, .terminal_input_select optgroup {
     font-size: 8px;
   }
   .admin_menu, .interactive_control_panel_file_upload, .terminal_input_file {
