@@ -4,7 +4,9 @@ import {connect} from 'react-redux';
 import {setToMainDisplayMode} from './../reducers/actions/OnMainPageAction';
 import {userService} from './../app-context/context';
 import {setSpinnerVisibility} from './../reducers/actions/spinnerAction';
+import {sypherService} from './../app-context/context';
 
+let CryptoJS = require("crypto-js");
 let count = 0;
 
 class FeedbackContainer extends React.Component {
@@ -89,8 +91,9 @@ class FeedbackContainer extends React.Component {
       let jsonFiles = this.state.files.map(file => {
         return(file);
       });
+      let sypheredFrom = this.cypherThis(this.state.from);
       let feedback = {
-        from: this.state.from,
+        from: sypheredFrom,
         theme: this.state.theme,
         body: this.state.body,
         files: jsonFiles
@@ -99,6 +102,20 @@ class FeedbackContainer extends React.Component {
         response.text().then(message => this.setState({message: message}));
       });
       this.props.dispatch(setSpinnerVisibility("none"));
+    }
+  }
+
+  cypherThis = (text) => {
+    let iv = CryptoJS.lib.WordArray.random(128/8).toString(CryptoJS.enc.Hex);
+    let salt = CryptoJS.lib.WordArray.random(128/8).toString(CryptoJS.enc.Hex);
+    if(text) {
+      let ciphertext = sypherService.encrypt(salt, iv, text);
+
+      let aesString = (iv + "::" + salt + "::" + ciphertext);
+      let cryptedString = btoa(aesString);
+      return cryptedString;
+    } else {
+      return text;
     }
   }
 

@@ -1,6 +1,7 @@
 package com.airnavigation.tradeunion.controllers;
 
 import com.airnavigation.tradeunion.domain.PlainDomain.RepresentationContainer;
+import com.airnavigation.tradeunion.security.Cryptographer;
 import com.airnavigation.tradeunion.services.RepresentationService;
 import com.airnavigation.tradeunion.services.interfaces.UserServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +18,15 @@ public class RepresentationController {
 
     private final RepresentationService service;
     private final UserServiceInterface userService;
+    private final Cryptographer cryptographer;
 
     @Autowired
     public RepresentationController(RepresentationService service,
-                                    UserServiceInterface userService) {
+                                    UserServiceInterface userService,
+                                    Cryptographer cryptographer) {
         this.service = service;
         this.userService = userService;
+        this.cryptographer = cryptographer;
     }
 
     @GetMapping(path = "/main")
@@ -40,6 +44,6 @@ public class RepresentationController {
 
     @PutMapping(path = "/password")
     public ResponseEntity<String> resetPassword(@RequestBody String email) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.resetPassword(email));
+        return ResponseEntity.status(HttpStatus.OK).body(userService.resetPassword(cryptographer.decode(email)));
     }
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import RESTORE_PASS_BTN from './../statics/restore-pass-btn-blue.png';
+import SAVE_BTN from './../statics/save.png';
 import "./../styles/questionnaireStyle.css";
 
 class Questionnaire extends React.Component {
@@ -19,6 +19,38 @@ class Questionnaire extends React.Component {
                   Як у закордонному паспорті або у свідоцтві диспетчера
                 </span>
               </div>
+          </div>
+
+          <div className="questionnarie_interactive_control_panel_row questionnarie_interactive_control_panel_row_quatro">
+            <span>Об'єкт, посада, зміна: </span>
+            <div className="auth-container">
+              <select className="terminal_input_quatro" onChange={this.props.onChangeFacility} defaultValue={this.props.facility}>
+                <option value="АДВ" >АДВ</option>
+                <option value="РДЦ" >РДЦ</option>
+              </select>
+              <span className="inscription" id="forgot_password_span">
+                Об'єкт
+              </span>
+            </div>
+            <div className="auth-container">
+              <input type="text" className="terminal_input_quatro" onChange={this.props.onChangePosition} value={this.props.position}/>
+              <span className="inscription" id="forgot_password_span">
+                Посада
+              </span>
+            </div>
+            <div className="auth-container">
+              <select className="terminal_input_quatro"  onChange={this.props.onChangeShift} defaultValue={this.props.shift}>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+              </select>
+              <span className="inscription" id="forgot_password_span">
+                Зміна
+              </span>
+            </div>
           </div>
 
           <div className="questionnarie_interactive_control_panel_row questionnarie_interactive_control_panel_row_quatro">
@@ -87,10 +119,7 @@ class Questionnaire extends React.Component {
               </div>
           </div>
           <div className="questionnarie_interactive_control_panel_row">
-            <span>Електронна адреса: </span><input type="email" className="questionarie_terminal_input" onChange={this.props.onChangeEmail} value={this.props.email}/>
-          </div>
-          <div className="questionnarie_interactive_control_panel_row">
-            <span>Місце народження: </span><input className="questionarie_terminal_input" onChange={this.props.onChangeUserCount}/>
+            <span>Місце народження: </span><input className="questionarie_terminal_input" onChange={this.props.onChangePlaceOfBirth} value={this.props.placeOfBirth}/>
           </div>
           <div className="questionnarie_interactive_control_panel_row">
             <span>Дата народження: </span><input type="date" className="questionarie_terminal_input" onChange={this.props.onChangeBirthDate} value={this.props.birthDate}/>
@@ -134,7 +163,7 @@ class Questionnaire extends React.Component {
             <div/>
             <div style={{display: "flex", justifyContent: "flex-end", marginTop: "10px"}}>
               <img  id="sing__up__btn"
-                    src={RESTORE_PASS_BTN}
+                    src={SAVE_BTN}
                     alt=""
                     className="sing__up__btn"
                     onClick={this.props.onClickSaveQuestionnaire}/>

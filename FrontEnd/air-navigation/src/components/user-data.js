@@ -3,6 +3,8 @@ import {Link} from 'react-router-dom';
 import USER_ICON_MALE from './../statics/user-icon-male.png';
 import USER_ICON_FEMALE from './../statics/user-icon-female.png';
 import CHANGE_PASSWORD_BTN from './../statics/change-pass-btn-blue.png';
+import FEEDBACK_BTN from './../statics/feedback.png';
+import QUESTIONNAIRE_BTN from './../statics/questionnaire.png';
 
 class UserData extends React.Component {
 
@@ -48,10 +50,10 @@ class UserData extends React.Component {
             <img className="password__change__button__img" src={CHANGE_PASSWORD_BTN} alt=""/>
           </Link>
           <Link className="password__change__button" to="/feedback">
-            <img className="password__change__button__img" src={CHANGE_PASSWORD_BTN} alt=""/>
+            <img className="password__change__button__img" src={FEEDBACK_BTN} alt=""/>
           </Link>
           <Link className="password__change__button" to="/questionnaire">
-            <img className="password__change__button__img" src={CHANGE_PASSWORD_BTN} alt=""/>
+            <img className="password__change__button__img" src={QUESTIONNAIRE_BTN} alt=""/>
           </Link>
         </div>
 

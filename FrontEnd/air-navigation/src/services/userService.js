@@ -72,4 +72,10 @@ export default class UserService {
       })
     });
   }
+
+  getQuestionnaire(id) {
+    return fetch(this.startUrl + "/" + id + "/questionnaire", {
+      method: "get"
+    });
+  }
 }

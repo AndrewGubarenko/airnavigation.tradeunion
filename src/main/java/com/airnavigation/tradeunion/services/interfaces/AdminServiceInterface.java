@@ -81,4 +81,17 @@ public interface AdminServiceInterface {
      */
     List<String> getLogs(int amountOfLogs) throws IOException;
 
+    /**
+     * Method for creating a report about members of trade union
+     * @return byte array with base64 encoded file
+     * @throws IOException
+     */
+    byte[] getFullReport() throws IOException;
+
+    /**
+     * Method for creating a report about children of trade union's members
+     * @return byte array with base64 encoded file
+     * @throws IOException
+     */
+    byte[] getChildrenReport() throws IOException;
 }

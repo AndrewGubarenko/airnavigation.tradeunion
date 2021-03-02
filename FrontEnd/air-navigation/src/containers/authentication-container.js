@@ -9,6 +9,9 @@ import {userService} from './../app-context/context';
 import {setNews} from './../reducers/actions/newsAction';
 import {setFiles} from './../reducers/actions/fileAction';
 import {setSpinnerVisibility} from './../reducers/actions/spinnerAction';
+import {sypherService} from './../app-context/context';
+
+let CryptoJS = require("crypto-js");
 
 class AuthenticationContainer extends React.Component {
 
@@ -56,8 +59,8 @@ class AuthenticationContainer extends React.Component {
       this.setState({borderColorPassword: "red"});
     } else {
       this.props.dispatch(setSpinnerVisibility("inline-block"));
-      let user_object = {username: this.state.email,
-                         password: this.state.password,
+      let user_object = {username: this.cypherThis(this.state.email),
+                         password: this.cypherThis(this.state.password),
                          remember_me: this.state.rememberMe}
       await userService.authenticate(user_object).then(response => {
         if(response.redirected && response.ok) {
@@ -85,6 +88,32 @@ class AuthenticationContainer extends React.Component {
   onClickClose = () => {
     this.props.dispatch(setIsAuthContainerVisible("none"));
     animateScroll.scrollToTop();
+  }
+
+  cypherThis = (text) => {
+    let iv = CryptoJS.lib.WordArray.random(128/8).toString(CryptoJS.enc.Hex);
+    let salt = CryptoJS.lib.WordArray.random(128/8).toString(CryptoJS.enc.Hex);
+    if(text) {
+      let ciphertext = sypherService.encrypt(salt, iv, text);
+
+      let aesString = (iv + "::" + salt + "::" + ciphertext);
+      let cryptedString = btoa(aesString);
+      return cryptedString;
+    } else {
+      return text;
+    }
+  }
+
+  decypherThis = (encryptedText) => {
+    if(encryptedText) {
+      let decodedText = atob(encryptedText);
+      let aesString = decodedText.split("::");
+      let ciphertext = aesString[2];
+      let decryptedText = sypherService.decrypt(aesString[1], aesString[0], ciphertext);
+      return decryptedText;
+    } else {
+      return encryptedText;
+    }
   }
 
   render() {

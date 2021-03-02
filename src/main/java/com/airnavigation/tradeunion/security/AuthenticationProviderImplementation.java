@@ -19,17 +19,20 @@ public class AuthenticationProviderImplementation implements AuthenticationProvi
 
     private final UserDetailsServiceImplementation userService;
     private final PasswordEncoder passwordEncoder;
+    private final Cryptographer cryptographer;
 
     @Autowired
-    public AuthenticationProviderImplementation(UserDetailsServiceImplementation userService) {
+    public AuthenticationProviderImplementation(UserDetailsServiceImplementation userService, Cryptographer cryptographer) {
         this.userService = userService;
         this.passwordEncoder = new BCryptPasswordEncoder();
+        this.cryptographer = cryptographer;
     }
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        String username = authentication.getName();
-        String password = authentication.getCredentials().toString();
+
+        String username = cryptographer.decode(authentication.getName());
+        String password = cryptographer.decode(authentication.getCredentials().toString());
 
         if(userService == null) {
             LOGGER.error("AUTHENTICATION PROVIDER: User service is null");

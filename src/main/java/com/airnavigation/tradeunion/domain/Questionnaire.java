@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.util.Map;
 import java.util.Objects;
 
@@ -30,22 +29,28 @@ public class Questionnaire {
     String nameUkrainian;
     @Column(name = "name_english")
     String nameEnglish;
+    @Column(name = "facility")
+    String facility;
+    @Column(name = "position")
+    String position;
+    @Column(name = "shift")
+    String shift;
     @Column(name = "passport_number")
     String passportNumber;
-    @Column(name = "passport_issue")
+    @Column(name = "passport_issue", columnDefinition = "text")
     String passportIssue;
     @Column(name = "passport_date_issue")
-    LocalDate passportDateIssue;
+    String passportDateIssue;
     @Column(name = "does_have_international_passport")
-    boolean doesHaveInternationalPassport;
+    String doesHaveInternationalPassport;
     @Column(name = "term_international_passport")
-    LocalDate termInternationalPassport;
+    String termInternationalPassport;
     @Column(name = "ident_number")
     String identNumber;
     @Column(name = "education")
     String education;
-    @Column(name = "education_term")
-    LocalDate educationTerm;
+    @Column(name = "education_term", columnDefinition = "text")
+    String educationTerm;
     @Column(name = "email")
     String email;
     @Column(name = "home_phone")
@@ -53,26 +58,29 @@ public class Questionnaire {
     @Column(name = "mobile_phone")
     String mobilePhone;
     @Column(name = "birth_date")
-    LocalDate birthDate;
-    @Column(name = "passport_address")
+    String placeOfBirth;
+    @Column(name = "place_of_birth")
+    String birthDate;
+    @Column(name = "passport_address", columnDefinition = "text")
     String passportAddress;
-    @Column(name = "actual_address")
+    @Column(name = "actual_address", columnDefinition = "text")
     String actualAddress;
     @Column(name = "employment_date")
-    LocalDate employmentDate;
+    String employmentDate;
     @Column(name = "seniority")
-    int seniority;
+    String seniority;
     @Column(name = "is_married")
-    boolean isMarried;
-    @Column(name = "family_composition")
+    String isMarried;
+    @Column(name = "family_composition", columnDefinition = "text")
     String familyComposition;
 
     @ElementCollection
     @CollectionTable(name = "children", joinColumns = {@JoinColumn(name = "questionnaire_id", referencedColumnName = "id")})
     @MapKeyColumn(name = "child_name")
     @Column(name = "child_date")
-    Map<String, LocalDate> children;
-    @Column(name = "additional_information")
+    Map<String, String> children;
+
+    @Column(name = "additional_information", columnDefinition = "text")
     String additionalInformation;
 
     @OneToOne
@@ -106,14 +114,15 @@ public class Questionnaire {
         if (!(o instanceof Questionnaire)) return false;
         Questionnaire that = (Questionnaire) o;
         return id == that.id &&
-                doesHaveInternationalPassport == that.doesHaveInternationalPassport &&
-                seniority == that.seniority &&
-                isMarried == that.isMarried &&
                 Objects.equals(nameUkrainian, that.nameUkrainian) &&
                 Objects.equals(nameEnglish, that.nameEnglish) &&
+                Objects.equals(facility, that.facility) &&
+                Objects.equals(position, that.position) &&
+                Objects.equals(shift, that.shift) &&
                 Objects.equals(passportNumber, that.passportNumber) &&
                 Objects.equals(passportIssue, that.passportIssue) &&
                 Objects.equals(passportDateIssue, that.passportDateIssue) &&
+                Objects.equals(doesHaveInternationalPassport, that.doesHaveInternationalPassport) &&
                 Objects.equals(termInternationalPassport, that.termInternationalPassport) &&
                 Objects.equals(identNumber, that.identNumber) &&
                 Objects.equals(education, that.education) &&
@@ -121,19 +130,22 @@ public class Questionnaire {
                 Objects.equals(email, that.email) &&
                 Objects.equals(homePhone, that.homePhone) &&
                 Objects.equals(mobilePhone, that.mobilePhone) &&
+                Objects.equals(placeOfBirth, that.placeOfBirth) &&
                 Objects.equals(birthDate, that.birthDate) &&
                 Objects.equals(passportAddress, that.passportAddress) &&
                 Objects.equals(actualAddress, that.actualAddress) &&
                 Objects.equals(employmentDate, that.employmentDate) &&
+                Objects.equals(seniority, that.seniority) &&
+                Objects.equals(isMarried, that.isMarried) &&
                 Objects.equals(familyComposition, that.familyComposition) &&
                 Objects.equals(children, that.children) &&
                 Objects.equals(additionalInformation, that.additionalInformation) &&
-                Objects.equals(user, that.user);
+                user.equals(that.user);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, nameUkrainian, nameEnglish, passportNumber, passportIssue, passportDateIssue, doesHaveInternationalPassport, termInternationalPassport, identNumber, education, educationTerm, email, homePhone, mobilePhone, birthDate, passportAddress, actualAddress, employmentDate, seniority, isMarried, familyComposition, children, additionalInformation, user);
+        return Objects.hash(id, nameUkrainian, nameEnglish, facility, position, shift, passportNumber, passportIssue, passportDateIssue, doesHaveInternationalPassport, termInternationalPassport, identNumber, education, educationTerm, email, homePhone, mobilePhone, placeOfBirth, birthDate, passportAddress, actualAddress, employmentDate, seniority, isMarried, familyComposition, children, additionalInformation, user);
     }
 
     @Override
@@ -142,23 +154,27 @@ public class Questionnaire {
                 "id=" + id +
                 ", nameUkrainian='" + nameUkrainian + '\'' +
                 ", nameEnglish='" + nameEnglish + '\'' +
+                ", facility='" + facility + '\'' +
+                ", position='" + position + '\'' +
+                ", shift='" + shift + '\'' +
                 ", passportNumber='" + passportNumber + '\'' +
                 ", passportIssue='" + passportIssue + '\'' +
-                ", passportDateIssue=" + passportDateIssue +
-                ", doesHaveInternationalPassport=" + doesHaveInternationalPassport +
-                ", termInternationalPassport=" + termInternationalPassport +
+                ", passportDateIssue='" + passportDateIssue + '\'' +
+                ", doesHaveInternationalPassport='" + doesHaveInternationalPassport + '\'' +
+                ", termInternationalPassport='" + termInternationalPassport + '\'' +
                 ", identNumber='" + identNumber + '\'' +
                 ", education='" + education + '\'' +
-                ", educationTerm=" + educationTerm +
+                ", educationTerm='" + educationTerm + '\'' +
                 ", email='" + email + '\'' +
                 ", homePhone='" + homePhone + '\'' +
                 ", mobilePhone='" + mobilePhone + '\'' +
-                ", birthDate=" + birthDate +
+                ", placeOfBirth='" + placeOfBirth + '\'' +
+                ", birthDate='" + birthDate + '\'' +
                 ", passportAddress='" + passportAddress + '\'' +
                 ", actualAddress='" + actualAddress + '\'' +
-                ", employmentDate=" + employmentDate +
-                ", seniority=" + seniority +
-                ", isMarried=" + isMarried +
+                ", employmentDate='" + employmentDate + '\'' +
+                ", seniority='" + seniority + '\'' +
+                ", isMarried='" + isMarried + '\'' +
                 ", familyComposition='" + familyComposition + '\'' +
                 ", children=" + children +
                 ", additionalInformation='" + additionalInformation + '\'' +

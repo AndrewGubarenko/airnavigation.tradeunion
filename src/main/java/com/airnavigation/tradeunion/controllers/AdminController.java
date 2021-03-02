@@ -5,6 +5,7 @@ import com.airnavigation.tradeunion.domain.File;
 import com.airnavigation.tradeunion.domain.News;
 import com.airnavigation.tradeunion.domain.PlainDomain.SearchRequest;
 import com.airnavigation.tradeunion.domain.User;
+import com.airnavigation.tradeunion.security.Cryptographer;
 import com.airnavigation.tradeunion.services.FileService;
 import com.airnavigation.tradeunion.services.NewsService;
 import com.airnavigation.tradeunion.services.interfaces.AdminServiceInterface;
@@ -30,14 +31,17 @@ public class AdminController {
     private final AdminServiceInterface adminService;
     private final FileService fileService;
     private final NewsService newsService;
+    private final Cryptographer cryptographer;
 
     @Autowired
     public AdminController(AdminServiceInterface adminService,
                            FileService fileService,
-                           NewsService newsService) {
+                           NewsService newsService,
+                           Cryptographer cryptographer) {
         this.adminService = adminService;
         this.fileService = fileService;
         this.newsService = newsService;
+        this.cryptographer = cryptographer;
     }
 
     /**
@@ -80,7 +84,11 @@ public class AdminController {
 
     @PostMapping(path = "/user")
     public ResponseEntity<User> createUser(@RequestBody User user) {
+        String decodedUsername = cryptographer.decode(user.getUsername());
+        user.setUsername(decodedUsername);
         User response = adminService.createUser(user);
+        String encodedUsername = cryptographer.encode(response.getUsername());
+        response.setUsername(encodedUsername);
         response.setPassword("");
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -88,20 +96,35 @@ public class AdminController {
     @GetMapping(path = "/users_list")
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> response = adminService.getListOfUsers();
-        response.forEach(user -> user.setPassword(""));
+        response.forEach(user -> {
+            String encodedUsername = cryptographer.encode(user.getUsername());
+            user.setUsername(encodedUsername);
+            user.setPassword("");
+            user.setQuestionnaire(null);
+        });
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping(path = "/user/filter")
     public ResponseEntity<List<User>> getUser(@RequestBody SearchRequest request) {
         List<User> response = adminService.findUser(request);
-        response.forEach(user -> user.setPassword(""));
+        response.forEach(user -> {
+            String encodedUsername = cryptographer.encode(user.getUsername());
+            user.setUsername(encodedUsername);
+            user.setPassword("");
+            user.setQuestionnaire(null);
+        });
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PutMapping(path = "/user/{id}")
+    @SuppressWarnings("Duplicates")
     public ResponseEntity<User> updateUser(@PathVariable long id, @RequestBody User user) {
+        String decodedUsername = cryptographer.decode(user.getUsername());
+        user.setUsername(decodedUsername);
         User response = adminService.updateUser(id, user);
+        String encodedUsername = cryptographer.encode(response.getUsername());
+        response.setUsername(encodedUsername);
         response.setPassword("");
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -213,4 +236,21 @@ public class AdminController {
         List<String> response = adminService.getLogs(amountOfLogs);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    /**
+     * Reports section
+     */
+
+    @GetMapping(path = "/full_report")
+    public ResponseEntity<byte[]> getFullReport() throws IOException {
+        byte[] response = adminService.getFullReport();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping(path = "/children_report")
+    public ResponseEntity<byte[]> getChildrenReport() throws IOException {
+        byte[] response = adminService.getChildrenReport();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 }

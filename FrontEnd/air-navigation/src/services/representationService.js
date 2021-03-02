@@ -22,7 +22,7 @@ export default class RepresentationService {
   }
 
   restorePassword(email) {
-    return fetch(this.startUrl + "/password", {
+    return fetch(this.startUrl + "password", {
       method: "put",
       body: email,
       headers: new Headers({

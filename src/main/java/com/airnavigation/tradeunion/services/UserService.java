@@ -50,7 +50,7 @@ public class UserService implements UserServiceInterface {
 
     @Override
     @Transactional
-    @PreAuthorize("#id == authentication.principal.getId() and #changePassword.currentPassword == authentication.credentials")
+    @PreAuthorize("hasRole('USER') and #id == authentication.principal.getId() and #changePassword.currentPassword == authentication.credentials")
     public String changePassword(ChangePassword changePassword, long id) {
         String response;
         Optional<User> userForUpdateOpt = userRepository.findById(id);
@@ -65,7 +65,7 @@ public class UserService implements UserServiceInterface {
         } else if(changePassword.getCurrentPassword() == null || changePassword.getCurrentPassword().trim().isEmpty()) {
             LOGGER.warn("METHOD CHANGE_PASSWORD: Current password field is empty");
             throw new EmptyDataFieldsException("ОТ ХАЛЕПА! Поле Поточний пароль порожнє");
-        } else if(passwordEncoder.encode(changePassword.getCurrentPassword()) == userForUpdateOpt.get().getPassword()) {
+        } else if(passwordEncoder.encode(changePassword.getCurrentPassword()).equals(userForUpdateOpt.get().getPassword())) {
             LOGGER.warn("METHOD CHANGE_PASSWORD: Wrong current password");
             throw new EmptyDataFieldsException("Неправильний поточний пароль");
         } else {
@@ -93,7 +93,7 @@ public class UserService implements UserServiceInterface {
 
     @Override
     @Transactional
-    @PreAuthorize("#id == authentication.principal.getId()")
+    @PreAuthorize("hasRole('USER') and #id == authentication.principal.getId()")
     @PostAuthorize("returnObject.username == authentication.principal.username")
     public User getUser(long id) {
         Optional<User> foundUserOpt = userRepository.findById(id);
@@ -170,7 +170,7 @@ public class UserService implements UserServiceInterface {
 
     @Override
     @Transactional
-    @PreAuthorize("#id == authentication.principal.getId()")
+    @PreAuthorize("hasRole('USER') and #id == authentication.principal.getId()")
     public Questionnaire saveQuestionnaire(long id, Questionnaire questionnaire) {
         StringBuilder response = new StringBuilder();
         Optional<User> userOpt = userRepository.findById(id);
@@ -188,23 +188,27 @@ public class UserService implements UserServiceInterface {
 
             userQuestionnaire.setNameUkrainian(questionnaire.getNameUkrainian());
             userQuestionnaire.setNameEnglish(questionnaire.getNameEnglish());
+            userQuestionnaire.setFacility(questionnaire.getFacility());
+            userQuestionnaire.setPosition(questionnaire.getPosition());
+            userQuestionnaire.setShift(questionnaire.getShift());
             userQuestionnaire.setPassportNumber(questionnaire.getPassportNumber());
             userQuestionnaire.setPassportIssue(questionnaire.getPassportIssue());
             userQuestionnaire.setPassportDateIssue(questionnaire.getPassportDateIssue());
-            userQuestionnaire.setDoesHaveInternationalPassport(questionnaire.isDoesHaveInternationalPassport());
+            userQuestionnaire.setDoesHaveInternationalPassport(questionnaire.getDoesHaveInternationalPassport());
             userQuestionnaire.setTermInternationalPassport(questionnaire.getTermInternationalPassport());
             userQuestionnaire.setIdentNumber(questionnaire.getIdentNumber());
             userQuestionnaire.setEducation(questionnaire.getEducation());
             userQuestionnaire.setEducationTerm(questionnaire.getEducationTerm());
-            userQuestionnaire.setEmail(questionnaire.getEmail());
+            userQuestionnaire.setEmail(user.getUsername());
             userQuestionnaire.setHomePhone(questionnaire.getHomePhone());
             userQuestionnaire.setMobilePhone(questionnaire.getMobilePhone());
+            userQuestionnaire.setPlaceOfBirth(questionnaire.getPlaceOfBirth());
             userQuestionnaire.setBirthDate(questionnaire.getBirthDate());
             userQuestionnaire.setPassportAddress(questionnaire.getPassportAddress());
             userQuestionnaire.setActualAddress(questionnaire.getActualAddress());
             userQuestionnaire.setEmploymentDate(questionnaire.getEmploymentDate());
             userQuestionnaire.setSeniority(questionnaire.getSeniority());
-            userQuestionnaire.setMarried(questionnaire.isMarried());
+            userQuestionnaire.setIsMarried(questionnaire.getIsMarried());
             userQuestionnaire.setFamilyComposition(questionnaire.getFamilyComposition());
 
             userQuestionnaire.setChildren(questionnaire.getChildren());
@@ -220,6 +224,23 @@ public class UserService implements UserServiceInterface {
                     .append(" не було знайдено!");
             LOGGER.warn(response);
             throw new NoSuchElementException(response.toString());
+        }
+    }
+
+    @Override
+    @Transactional
+    @PreAuthorize("hasRole('USER') and #id == authentication.principal.getId()")
+    public Questionnaire getQuestionnaire(long id) {
+        Optional<User> userOpt = userRepository.findById(id);
+        if(userOpt.isPresent()) {
+            User user = userOpt.get();
+            if(user.getQuestionnaire() == null) {
+                return new Questionnaire();
+            } else {
+                return user.getQuestionnaire();
+            }
+        } else {
+            return new Questionnaire();
         }
     }
 }

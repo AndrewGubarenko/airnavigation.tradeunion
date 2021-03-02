@@ -12,7 +12,6 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -63,7 +62,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception{
         http
                 .authorizeRequests()
-
                 .antMatchers(HttpMethod.GET, "/administrator/**").hasRole(Role.ADMINISTRATOR.name())
                 .antMatchers(HttpMethod.GET, "/administrator/**").authenticated()
                 .antMatchers(HttpMethod.POST, "/administrator/**").hasRole(Role.ADMINISTRATOR.name())
@@ -97,8 +95,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             .and()
                 .rememberMe()
                 .key("SuperSecretKey")
-                //TODO: Repair time
-                .tokenValiditySeconds(6000)
+                .tokenValiditySeconds(604800)
             .and()
                 .logout()
                 .logoutUrl("/user/logout").permitAll()
@@ -126,6 +123,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(11);
     }
 }

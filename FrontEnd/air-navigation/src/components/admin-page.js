@@ -15,6 +15,7 @@ class AdminPage extends React.Component {
             <li className="admin_menu_list_item" onClick={this.props.onClickGetLogs}>Get Logs</li>
             <li className="admin_menu_list_item" onClick={this.props.onClicUpdateAcounts}>Update acounts</li>
             <li className="admin_menu_list_item" onClick={this.props.onClicUpdateDataBase}>Update Data base</li>
+            <li className="admin_menu_list_item" onClick={this.props.onClicReports}>Reports</li>
           </ul>
         </div>
         <div id="screen">
@@ -229,6 +230,13 @@ class AdminPage extends React.Component {
             </div>
 
 {/*Files upload functions*/}
+
+{/*Reports panel*/}
+            <div className="interactive_button_container" style={{display: this.props.reportsControlPanelDisplay}}>
+              <button className="admin_screen_btn" onClick={this.props.onClickGetFullReport} style={{width: "auto"}}>Get Full Report</button>
+            </div>
+{/*Reports panel*/}
+
           </div>
           <div id="list_screen">
             {this.props.terminalData}

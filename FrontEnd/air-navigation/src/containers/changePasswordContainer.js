@@ -4,6 +4,9 @@ import {userService} from './../app-context/context';
 import {setToMainDisplayMode} from './../reducers/actions/OnMainPageAction';
 import {connect} from 'react-redux';
 import {setSpinnerVisibility} from './../reducers/actions/spinnerAction';
+import {sypherService} from './../app-context/context';
+
+let CryptoJS = require("crypto-js");
 
 class ChangePasswordContainer extends React.Component {
 
@@ -59,8 +62,8 @@ class ChangePasswordContainer extends React.Component {
       this.setState({borderColorNewPass: "red"});
     } else {
       this.props.dispatch(setSpinnerVisibility("inline-block"));
-      let correctPassData = {currentPassword: this.state.passData.currentPassword,
-                             newPassword: this.state.passData.newPassword}
+      let correctPassData = {currentPassword: this.cypherThis(this.state.passData.currentPassword),
+                             newPassword: this.cypherThis(this.state.passData.newPassword)}
       await userService.changePassword(correctPassData, this.props.user.id).then(response => {
         response.text().then(message => {
           this.setState({message: message});
@@ -72,6 +75,20 @@ class ChangePasswordContainer extends React.Component {
         });
       })
       this.props.dispatch(setSpinnerVisibility("none"));
+    }
+  }
+
+  cypherThis = (text) => {
+    let iv = CryptoJS.lib.WordArray.random(128/8).toString(CryptoJS.enc.Hex);
+    let salt = CryptoJS.lib.WordArray.random(128/8).toString(CryptoJS.enc.Hex);
+    if(text) {
+      let ciphertext = sypherService.encrypt(salt, iv, text);
+
+      let aesString = (iv + "::" + salt + "::" + ciphertext);
+      let cryptedString = btoa(aesString);
+      return cryptedString;
+    } else {
+      return text;
     }
   }
 

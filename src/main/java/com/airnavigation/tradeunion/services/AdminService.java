@@ -13,6 +13,7 @@ import com.airnavigation.tradeunion.exceptions.IllegalAccessAttemtException;
 import com.airnavigation.tradeunion.services.interfaces.AdminServiceInterface;
 import com.airnavigation.tradeunion.utilities.EmailServiceImpl;
 import com.airnavigation.tradeunion.utilities.FileProcessor;
+import com.airnavigation.tradeunion.utilities.Reporter;
 import com.airnavigation.tradeunion.utilities.TemporaryPasswordGenerator;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,7 @@ public class AdminService implements AdminServiceInterface {
     private final TemporaryPasswordGenerator passwordGenerator;
     private final EmailServiceImpl emailService;
     private final PasswordEncoder passwordEncoder;
+    private final Reporter reporter;
 
 
     @Autowired
@@ -49,13 +51,15 @@ public class AdminService implements AdminServiceInterface {
                          FileProcessor fileProcessor,
                          TemporaryPasswordGenerator passwordGenerator,
                          EmailServiceImpl emailService,
-                         BCryptPasswordEncoder passwordEncoder) {
+                         BCryptPasswordEncoder passwordEncoder,
+                         Reporter reporter) {
         this.adminRepository = adminRepository;
         this.questionnaireRepository = questionnaireRepository;
         this.fileProcessor = fileProcessor;
         this.passwordGenerator = passwordGenerator;
         this.emailService = emailService;
         this.passwordEncoder = passwordEncoder;
+        this.reporter = reporter;
     }
 
     @Override
@@ -80,7 +84,7 @@ public class AdminService implements AdminServiceInterface {
 
         String password;
 
-        user.setUsername(user.getUsername().trim());
+        user.setUsername(user.getUsername().trim().toLowerCase());
         user.setFirstName(user.getFirstName().trim());
         user.setLastName(user.getLastName().trim());
         if (user.getCount() == null) {
@@ -316,4 +320,13 @@ public class AdminService implements AdminServiceInterface {
         return response;
     }
 
+    @Override
+    public byte[] getFullReport() throws IOException{
+        return reporter.createFullReportFromQuestionnaires();
+    }
+
+    @Override
+    public byte[] getChildrenReport() throws IOException{
+        return reporter.createChildrenReportFromQuestionnaires();
+    }
 }

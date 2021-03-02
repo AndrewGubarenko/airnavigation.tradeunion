@@ -1,5 +1,5 @@
 import React from 'react';
-import RESTORE_PASS_BTN from './../statics/restore-pass-btn-blue.png';
+import SEND_BTN from './../statics/send.png';
 
 class Feedback extends React.Component {
 
@@ -30,7 +30,7 @@ class Feedback extends React.Component {
           <div className="auth-container last-auth-container" style={{marginRight: "30px"}}>
               <div>
                 <img  id="sing__up__btn"
-                      src={RESTORE_PASS_BTN}
+                      src={SEND_BTN}
                       alt=""
                       className="sing__up__btn"
                       onClick={this.props.onClickSendEmail}/>

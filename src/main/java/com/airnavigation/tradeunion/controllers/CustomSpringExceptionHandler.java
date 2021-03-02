@@ -8,6 +8,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailSendException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -162,23 +163,28 @@ public class CustomSpringExceptionHandler extends ExceptionHandlerExceptionResol
     public ResponseEntity<String> onIncorrectResultSizeDataAccessException(IncorrectResultSizeDataAccessException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StringBuilder()
                 .append("ОТ ХАЛЕПА! Duplicate firstName and lastName in DB")
-                .append(ex.fillInStackTrace().getMessage())
+                .append(ex.getCause())
                 .toString());
     }
 
     @ExceptionHandler
     public ResponseEntity<String> onNonUniqueResultException(NonUniqueResultException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new StringBuilder()
-                .append("ОТ ХАЛЕПА! Duplicate firstName and lastName in DB")
-                .append(ex.fillInStackTrace().getMessage())
+                .append("ОТ ХАЛЕПА! Duplicate firstName and lastName in DB ")
                 .toString());
     }
 
     @ExceptionHandler
     public ResponseEntity<String> onMessagingException(MessagingException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StringBuilder()
-                .append("ОТ ХАЛЕПА! Неможливо відправити листа!")
-                .append(ex.fillInStackTrace().getMessage())
+                .append("ОТ ХАЛЕПА! Неможливо відправити листа! ")
+                .toString());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> onMailSendException(MailSendException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StringBuilder()
+                .append("ОТ ХАЛЕПА! Щось не так із eMail адресою! ")
                 .toString());
     }
 }

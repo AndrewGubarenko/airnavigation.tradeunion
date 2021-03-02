@@ -48,4 +48,10 @@ public interface UserServiceInterface {
      */
     Questionnaire saveQuestionnaire(long id, Questionnaire questionnaire);
 
+    /**
+     * method for getting user's questionnaire
+     * @param id
+     * @return
+     */
+    Questionnaire getQuestionnaire(long id);
 }

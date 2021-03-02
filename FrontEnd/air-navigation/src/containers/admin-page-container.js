@@ -5,6 +5,9 @@ import {setToMainDisplayMode} from './../reducers/actions/OnMainPageAction';
 import {setSpinnerVisibility} from './../reducers/actions/spinnerAction';
 import {connect} from 'react-redux';
 import {scroller} from 'react-scroll';
+import {sypherService} from './../app-context/context';
+
+let CryptoJS = require("crypto-js");
 
 class AdminPageContainer extends React.Component {
 
@@ -69,6 +72,7 @@ class AdminPageContainer extends React.Component {
       XMLDatabaseUpdateControlPanelDisplay: "none",
       categoriesUpdateControlPanelDisplay: "none",
       logsControlPanelDisplay: "none",
+      reportsControlPanelDisplay: "none",
       selected: "MALE",
       checked: false,
       borderColorUsername: "darkgrey",
@@ -91,6 +95,10 @@ class AdminPageContainer extends React.Component {
     this.setSelection();
     this.props.dispatch(setToMainDisplayMode("block"));
     this.props.dispatch(setSpinnerVisibility("none"));
+  }
+
+  componentWillUnmount() {
+    this.clearState();
   }
 
   clearState = () => {
@@ -153,6 +161,7 @@ class AdminPageContainer extends React.Component {
                       XMLDatabaseUpdateControlPanelDisplay: "none",
                       logsControlPanelDisplay: "none",
                       categoriesUpdateControlPanelDisplay: "none",
+                      reportsControlPanelDisplay: "none",
                       selected: "MALE",
                       checked: false,
                       borderColorUsername: "darkgrey",
@@ -233,7 +242,10 @@ class AdminPageContainer extends React.Component {
     } else if(Number.parseFloat(this.state.user.count) !== 0 && !Number.parseFloat(this.state.user.count)) {
       this.setState({borderColorCount: "red"});
     } else {
-      adminService.createUser(this.state.user).then(response => {
+      let user = this.state.user;
+      let encryptedUsername = this.cypherThis(user.username);
+      user.username = encryptedUsername;
+      adminService.createUser(user).then(response => {
         if(response.ok) {
           return response.json().then(data => {
             this.setState({user: data})
@@ -631,6 +643,8 @@ class AdminPageContainer extends React.Component {
           <div>
               {
                 list.map(item => {
+                  let decryptedUsername = this.decypherThis(item.username);
+                  item.username = decryptedUsername;
                   return(
                     <div key={item.id} className="admin_result_list_item" style={{cursor: "pointer"}} onClick={async() => {
                         await this.setState({user: item});
@@ -946,6 +960,65 @@ class AdminPageContainer extends React.Component {
   }
 
 /*Files upload functions*/
+/*Reports functions*/
+  onClicReports = () => {
+    this.clearState();
+    this.setState({reportsControlPanelDisplay: "block"});
+  }
+
+  onClickGetFullReport = () => {
+    this.props.dispatch(setSpinnerVisibility("inline-block"));
+    adminService.getFullReport().then(response => {
+      if(response.ok) {
+        response.text().then(message => {
+          let element = document.createElement('a');
+          element.setAttribute('href', 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,' + encodeURIComponent(message));
+          element.setAttribute('download', "full_report.xlsx");
+
+          element.style.display = 'none';
+          document.body.appendChild(element);
+
+          element.click();
+
+          document.body.removeChild(element);
+
+        });
+      } else {
+        response.text().then(message => {
+          this.setState({terminalData: message});
+        });
+      }
+      this.props.dispatch(setSpinnerVisibility("none"));
+    })
+  }
+/*Reports functions*/
+
+  cypherThis = (text) => {
+    let iv = CryptoJS.lib.WordArray.random(128/8).toString(CryptoJS.enc.Hex);
+    let salt = CryptoJS.lib.WordArray.random(128/8).toString(CryptoJS.enc.Hex);
+    if(text) {
+      let ciphertext = sypherService.encrypt(salt, iv, text);
+
+      let aesString = (iv + "::" + salt + "::" + ciphertext);
+      let cryptedString = btoa(aesString);
+      return cryptedString;
+    } else {
+      return text;
+    }
+  }
+
+  decypherThis = (encryptedText) => {
+    if(encryptedText) {
+      let decodedText = atob(encryptedText);
+      let aesString = decodedText.split("::");
+      let ciphertext = aesString[2];
+      let decryptedText = sypherService.decrypt(aesString[1], aesString[0], ciphertext);
+      return decryptedText;
+    } else {
+      return encryptedText;
+    }
+  }
+
   render() {
     return(
       <AdminPage
@@ -979,6 +1052,7 @@ class AdminPageContainer extends React.Component {
         DeleteCategoryYesNoContainerDisplay={this.state.DeleteCategoryYesNoContainerDisplay}
         logsControlPanelDisplay={this.state.logsControlPanelDisplay}
         categoriesUpdateControlPanelDisplay={this.state.categoriesUpdateControlPanelDisplay}
+        reportsControlPanelDisplay={this.state.reportsControlPanelDisplay}
 
         borderColorUsername={this.state.borderColorUsername}
         borderColorFirstName={this.state.borderColorFirstName}
@@ -1053,6 +1127,9 @@ class AdminPageContainer extends React.Component {
         XMLDatabaseUpdateControlPanelDisplay={this.state.XMLDatabaseUpdateControlPanelDisplay}
         onChangeUpdateDatabaseFile={this.onChangeUpdateDatabaseFile}
         onClickUploadDatabaseFile={this.onClickUploadDatabaseFile}
+
+        onClicReports={this.onClicReports}
+        onClickGetFullReport={this.onClickGetFullReport}
 
         onChangeAmount={this.onChangeAmount}
         onClickGetAmountOfLogs={this.onClickGetAmountOfLogs}

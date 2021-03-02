@@ -4,6 +4,9 @@ import {representationService} from './../app-context/context';
 import {setToMainDisplayMode} from './../reducers/actions/OnMainPageAction';
 import {connect} from 'react-redux';
 import {setSpinnerVisibility} from './../reducers/actions/spinnerAction';
+import {sypherService} from './../app-context/context';
+
+let CryptoJS = require("crypto-js");
 
 class RestorePasswordContainer extends React.Component {
 
@@ -30,7 +33,7 @@ class RestorePasswordContainer extends React.Component {
       this.setState({borderColorRestorePass: "red"});
     } else {
       this.props.dispatch(setSpinnerVisibility("inline-block"));
-      await representationService.restorePassword(this.state.email).then(response => {
+      await representationService.restorePassword(this.cypherThis(this.state.email)).then(response => {
         response.text().then(message => {
           this.setState({email: ""})
           this.setState({message: message});
@@ -42,6 +45,20 @@ class RestorePasswordContainer extends React.Component {
 
   onClickRodger = () => {
     this.props.history.push("/main")
+  }
+
+  cypherThis = (text) => {
+    let iv = CryptoJS.lib.WordArray.random(128/8).toString(CryptoJS.enc.Hex);
+    let salt = CryptoJS.lib.WordArray.random(128/8).toString(CryptoJS.enc.Hex);
+    if(text) {
+      let ciphertext = sypherService.encrypt(salt, iv, text);
+
+      let aesString = (iv + "::" + salt + "::" + ciphertext);
+      let cryptedString = btoa(aesString);
+      return cryptedString;
+    } else {
+      return text;
+    }
   }
 
   render() {
