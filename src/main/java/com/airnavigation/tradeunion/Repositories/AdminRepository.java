@@ -15,8 +15,8 @@ import java.util.Optional;
 public interface AdminRepository extends CrudRepository<User, Long> {
     /**
      * Method for retrieving of user by it`s first name and last name
-     * @param firstName
-     * @param lastName
+     * @param firstName user`s first name
+     * @param lastName user`s last name
      * @return Optional of user
      */
     Optional<User> findByFirstNameAndLastNameIgnoreCase (String firstName, String lastName);
@@ -29,16 +29,16 @@ public interface AdminRepository extends CrudRepository<User, Long> {
 
     /**
      * Method for retrieving user by it`s username, that is used as login
-     * @param username
+     * @param username unique user`s username (email)
      * @return Optional of user
      */
     Optional<User> findByUsername (String username);
 
     /**
      * Method for serching user by it`s username, firstName or lastName
-     * @param username
-     * @param firstName
-     * @param lastName
+     * @param username unique user`s username (email)
+     * @param firstName user`s first name
+     * @param lastName user`s last name
      * @return List of found users
      */
     List<User> findAllByUsernameOrFirstNameOrLastNameIgnoreCase (String username, String firstName, String lastName);

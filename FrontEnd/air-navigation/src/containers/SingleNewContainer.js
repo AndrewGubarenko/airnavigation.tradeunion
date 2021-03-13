@@ -1,8 +1,8 @@
 import React from 'react';
 import SingleNew from '../components/SingleNew';
-import {setToMainDisplayMode} from './../reducers/actions/OnMainPageAction';
+import {setToMainDisplayMode} from '../reducers/actions/OnMainPageAction';
 import {connect} from 'react-redux';
-import {setSpinnerVisibility} from './../reducers/actions/spinnerAction';
+import {setSpinnerVisibility} from '../reducers/actions/spinnerAction';
 
 class SingleNewContainer extends React.Component {
 

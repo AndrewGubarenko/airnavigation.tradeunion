@@ -30,7 +30,7 @@ class GoUpButtonContainer extends React.Component {
     });
   }
 
-  onScrollGoUpButton = (event) => {
+  onScrollGoUpButton = () => {
     if (window.scrollY === 0 && this.state.visibilityGoUpButton === "visible") {
         this.setState({visibilityGoUpButton: "hidden"});
         this.setState({opacityGoUpButton: 0});

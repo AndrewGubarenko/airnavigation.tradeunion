@@ -1,5 +1,6 @@
 import React from 'react';
 import SING_IN_BTN from './../statics/submit-btn-blue.png';
+import SHOW_PASS from './../statics/showPass.png';
 import {Link} from 'react-router-dom';
 
 class Header extends React.Component {
@@ -7,11 +8,11 @@ class Header extends React.Component {
   render() {
     return(
       <div id="auth__container" style={{display: this.props.isAuthVisible }}>
-        <div className="standart-container">
+        <div className="standard-container">
 
           <p className="container-name">Особисті дані</p>
           <div className="border-plane-container">
-            <div className="standart-container-line">
+            <div className="standard-container-line">
               <svg className="svg-plane-icon">
                 <use xlinkHref="#svg-plane"/>
               </svg>
@@ -41,9 +42,15 @@ class Header extends React.Component {
               <label className="auth__label label__password" style={{borderBottomColor: this.props.borderColorPassword}}>
                 <span className="label-text">Password</span>
                 <input  className="auth__input"
-                        type="password"
+                        type={this.props.passType}
                         onChange={this.props.onChangePassword}
                         value={this.props.password}/>
+                  <img  id="show_pass"
+                        src={SHOW_PASS}
+                        alt=""
+                        onMouseEnter={this.props.onShowPass}
+                        onMouseOut={this.props.onHidePass}
+                        />
               </label>
               <div>
                 <label id="checkbox">

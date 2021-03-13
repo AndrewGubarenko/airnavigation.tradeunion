@@ -174,10 +174,10 @@ class FileContainer extends React.Component {
 
   render() {
     return(
-      <div id="file__container" className="standart-container" style={{display: this.props.displayFiles}}>
+      <div id="file__container" className="standard-container" style={{display: this.props.displayFiles}}>
         <p className="container-name">Файли</p>
         <div className="border-plane-container">
-          <div className="standart-container-line">
+          <div className="standard-container-line">
             <svg className="svg-plane-icon">
               <use xlinkHref="#svg-plane"/>
             </svg>

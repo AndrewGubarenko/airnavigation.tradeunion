@@ -6,10 +6,6 @@ import com.airnavigation.tradeunion.domain.User;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * @author Andrii Hubarenko
- * The container for collection of all data, that are necessary for main page representation
- */
 import java.util.List;
 
 @Getter

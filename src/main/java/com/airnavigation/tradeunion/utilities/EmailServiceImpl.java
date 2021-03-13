@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.io.File;
 import java.util.List;
 
 @Component
@@ -31,6 +32,8 @@ public class EmailServiceImpl {
         helper.setSubject(subject);
         helper.setFrom(from);
         helper.setText(text, true);
+        helper.addInline("logo", new File("src/main/resources/static/logo.png"));
+        helper.addInline("arrow", new File("src/main/resources/static/arrow_outline.png"));
         for (FeedbackFile file: files) {
             String fullBase64 = file.getBase64().split("base64,", 2)[1];
             System.out.println(fullBase64);

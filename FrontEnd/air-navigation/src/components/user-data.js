@@ -18,11 +18,11 @@ class UserData extends React.Component {
 
   render() {
     return(
-      <div className="standart-container">
+      <div className="standard-container">
 
         <p className="container-name">Особисті дані</p>
         <div className="border-plane-container">
-          <div className="standart-container-line">
+          <div className="standard-container-line">
             <svg className="svg-plane-icon">
               <use xlinkHref="#svg-plane"/>
             </svg>

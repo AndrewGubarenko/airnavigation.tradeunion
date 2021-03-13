@@ -5,13 +5,13 @@ import FilesContainer from './file-container';
 import UserDataContainer from './user-data-container';
 import AuthenticationContainer from './authentication-container';
 import {connect} from 'react-redux';
-import {setNews} from './../reducers/actions/newsAction';
-import {setFiles} from './../reducers/actions/fileAction';
-import {representationService} from './../app-context/context';
-import {setToMainDisplayMode} from './../reducers/actions/OnMainPageAction';
-import {setSpinnerVisibility} from './../reducers/actions/spinnerAction';
-import {setIsAuthenticated} from './../reducers/actions/userAction';
-import {setAdminDisplayMode} from './../reducers/actions/AdminAction';
+import {setNews} from '../reducers/actions/newsAction';
+import {setFiles} from '../reducers/actions/fileAction';
+import {representationService} from '../app-context/context';
+import {setToMainDisplayMode} from '../reducers/actions/OnMainPageAction';
+import {setSpinnerVisibility} from '../reducers/actions/spinnerAction';
+import {setIsAuthenticated} from '../reducers/actions/userAction';
+import {setAdminDisplayMode} from '../reducers/actions/AdminAction';
 
 class MainPageContainer extends React.Component {
 

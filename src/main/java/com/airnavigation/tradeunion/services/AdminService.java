@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
+import javax.persistence.NonUniqueResultException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -72,9 +73,6 @@ public class AdminService implements AdminServiceInterface {
             throw new EmptyDataFieldsException("Поле email - порожнє!");
         }
 
-        /**
-         * For checking on unique firstName + lastName in DB
-         */
         Optional<User> userForCheckOpt = adminRepository.findByFirstNameAndLastNameIgnoreCase(user.getFirstName().trim(), user.getLastName());
         if(userForCheckOpt.isPresent()) {
             String response = "METHOD CREATE: The user with firstName: " + user.getFirstName().trim() + " and lastName: " + user.getLastName() + " already exist";
@@ -94,7 +92,7 @@ public class AdminService implements AdminServiceInterface {
             user.setGender(Gender.MALE);
         }
         if(user.getRoles() == null || user.getRoles().isEmpty()) {
-            user.setRoles(new HashSet<>(Arrays.asList(Role.USER)));
+            user.setRoles(new HashSet<>(Collections.singletonList(Role.USER)));
             password = passwordGenerator.generateTemporaryPassword(15);
             user.setPassword(passwordEncoder.encode(password));
             accessLevel = Role.USER.name();
@@ -113,14 +111,18 @@ public class AdminService implements AdminServiceInterface {
             emailService.sendMimeMessage(user.getUsername(),
                     "Реєстрація користувача",
                     "andrewgubarenko@gmail.com",
-                    new StringBuilder().append("<H2>Вітаю! Вас зареєстровано на сайті профспілки Аеронавігація.</H2>\n")
+                    new StringBuilder().append("<html><body>")
+                            .append("<img src='cid:logo' alt='Logo' width='128' height='128'/>")
+                            .append("<H2>Вітаю! Вас зареєстровано на сайті профспілки Аеронавігація.</H2>")
+                            .append("<img src='cid:arrow' alt='Logo' width='200px'/>")
                             .append("<p>Ваш тимчасовий пароль для доступу до особистого кабінету: ")
-                            .append(password)
+                                .append(password)
                             .append("</p>")
-                            .append("\n")
-                            .append("<p>Радимо змінити цей пароль на свій власний. </p>\n")
+                            .append("<p>Радимо змінити цей пароль на свій власний. </p>")
                             .append("<p>Також радимо використовувати надійні паролі, наприклад ті, що генеруються Google.</p>")
-                            .append("<p>Увага! Цей лист згенеровано автоматично. Не відповідайте на нього.</p>").toString(),
+                            .append("<p>Увага! Цей лист згенеровано автоматично. Не відповідайте на нього.</p>")
+                            .append("<img src='cid:arrow' alt='Logo' width='200px'/>")
+                            .append("</body></html>").toString(),
                     new ArrayList<>());
         } catch (MessagingException ex) {
             LOGGER.info("Something wrong with email. Unable to send an email to " + user.getUsername() + "\n" + ex.getLocalizedMessage());
@@ -199,7 +201,7 @@ public class AdminService implements AdminServiceInterface {
     @Transactional
     public User getUser(long id) {
         Optional<User> foundUserOpt = adminRepository.findById(id);
-        if(!foundUserOpt.isPresent()) {
+        if(foundUserOpt.isEmpty()) {
             LOGGER.warn("METHOD GET: User with id=" + id + " has been not found!");
             throw new NoSuchElementException("Такого користувача в базі не існує!");
         }
@@ -209,8 +211,7 @@ public class AdminService implements AdminServiceInterface {
     @Override
     @Transactional
     public List<User> findUser(SearchRequest request) {
-        List<User> foundUsers = adminRepository.findAllByUsernameOrFirstNameOrLastNameIgnoreCase (request.getUsername(), request.getFirstName(), request.getLastName());
-        return foundUsers;
+        return adminRepository.findAllByUsernameOrFirstNameOrLastNameIgnoreCase (request.getUsername(), request.getFirstName(), request.getLastName());
     }
 
     @Override
@@ -229,22 +230,20 @@ public class AdminService implements AdminServiceInterface {
             LOGGER.warn("METHOD UPDATE: The firstName or lastName field , or both are empty!");
             throw new EmptyDataFieldsException("Поля first name або last name, або обидва є порожніми!");
         }
-        if(!userForUpdateOpt.isPresent()) {
+        if(userForUpdateOpt.isEmpty()) {
             LOGGER.warn("METHOD UPDATE: User with username " + updatedUser.getUsername() + " has been not found");
             throw new NoSuchElementException("Такого користувача не знайдено!");
         }
 
-        /**
-         * For checking on unique firstName + lastName in DB
-         */
         Optional<User> userForCheckOpt = adminRepository.findByFirstNameAndLastNameIgnoreCase(updatedUser.getFirstName().trim(), updatedUser.getLastName());
-        if(userForCheckOpt.isPresent()) {
+        User userForUpdate = userForUpdateOpt.get();
+        if(userForCheckOpt.isPresent() && !userForUpdate.getUsername().equals(userForCheckOpt.get().getUsername())) {
             String response = "METHOD UPDATE: The user with firstName: " + updatedUser.getFirstName().trim() + " and lastName: " + updatedUser.getLastName() + " already exist";
             LOGGER.warn(response);
-            return userForCheckOpt.get();
+            throw new NonUniqueResultException();
         }
 
-        User userForUpdate = userForUpdateOpt.get();
+
         userForUpdate.setFirstName(updatedUser.getFirstName().trim());
         userForUpdate.setLastName(updatedUser.getLastName().trim());
         userForUpdate.setGender(updatedUser.getGender());
@@ -254,28 +253,52 @@ public class AdminService implements AdminServiceInterface {
             userForUpdate.setRoles(updatedUser.getRoles());
             userForUpdate.setPassword(passwordEncoder.encode(passwordGenerator.generateTemporaryPassword(30)));
             adminRepository.save(userForUpdate);
-            //TODO: repair this module
-            /*emailService.sendMimeMessage(user.getUsername(),
-                                            "Встановлення рівня доступу Адміністратор",
-                                            new StringBuilder().append("Ваш рівень доступу на сайті профспілки Аеронавігація було підвищено до рівня Адміністратор.\n")
-                                                               .append("Ваш пароль на сайті профспілки Аеронавігація було перевстановлено.\n")
-                                                               .append("Ваш новий пароль для доступу до особистого кабінету: ")
-                                                               .append(userForUpdate.getPassword())
-                                                               .append("\n")
-                                                               .append("Увага! Цей лист згенеровано автоматично. Не відповідайте на нього.")
-                                                    .toString());*/
+
+            try {
+                emailService.sendMimeMessage(userForUpdate.getUsername(),
+                        "Встановлення рівня доступу Адміністратор",
+                        "andrewgubarenko@gmail.com",
+                        new StringBuilder()
+                                .append("<html><body>")
+                                .append("<img src='cid:logo' alt='Logo' width='128' height='128'/>")
+                                .append("<H2>Ваш рівень доступу на сайті профспілки Аеронавігація було підвищено до рівня Адміністратор.</H2>")
+                                .append("<img src='cid:arrow' alt='Logo' width='200px'/>")
+                                .append("<p>Ваш пароль на сайті профспілки Аеронавігація було перевстановлено.</p>")
+                                .append("<p>Ваш новий пароль для доступу до особистого кабінету: ")
+                                    .append(userForUpdate.getPassword())
+                                .append("</p>")
+                                .append("<p>Увага! Цей лист згенеровано автоматично. Не відповідайте на нього.</p>")
+                                .append("<img src='cid:arrow' alt='Logo' width='200px'/>")
+                                .append("</body></html>")
+                                .toString(),
+                        new ArrayList<>());
+            } catch (MessagingException ex) {
+                LOGGER.info("Something wrong with email. Unable to send an email to " + userForUpdate.getUsername() + "\n" + ex.getLocalizedMessage());
+            }
+
         } else if(userForUpdate.getRoles().contains(Role.ADMINISTRATOR) && !updatedUser.getRoles().contains(Role.ADMINISTRATOR)) {
             userForUpdate.setRoles(updatedUser.getRoles());
         } else {
             userForUpdate.setRoles(updatedUser.getRoles());
             adminRepository.save(userForUpdate);
-            //TODO: repair this module
-            /*emailService.sendMimeMessage(user.getUsername(),
-                                            "Встановлення рівня доступу Адміністратор",
-                                            new StringBuilder().append("Ваш рівень доступу на сайті профспілки Аеронавігація було знижено до рівня Користувач.\n")
-                                                               .append("\n")
-                                                               .append("Увага! Цей лист згенеровано автоматично. Не відповідайте на нього.")
-                                                    .toString());*/
+
+            try {
+                emailService.sendMimeMessage(userForUpdate.getUsername(),
+                        "Встановлення рівня доступу Адміністратор",
+                        "andrewgubarenko@gmail.com",
+                        new StringBuilder()
+                                .append("<html><body>")
+                                .append("<img src='cid:logo' alt='Logo' width='128' height='128'/>")
+                                .append("<H2>Ваш рівень доступу на сайті профспілки Аеронавігація було знижено до рівня Користувач.</H2>")
+                                .append("<img src='cid:arrow' alt='Logo' width='200px'/>")
+                                .append("<p>Увага! Цей лист згенеровано автоматично. Не відповідайте на нього.</p>")
+                                .append("<img src='cid:arrow' alt='Logo' width='200px'/>")
+                                .append("</body></html>")
+                                .toString(),
+                        new ArrayList<>());
+            } catch (MessagingException ex) {
+                LOGGER.info("Something wrong with email. Unable to send an email to " + userForUpdate.getUsername() + "\n" + ex.getLocalizedMessage());
+            }
         }
         LOGGER.info("METHOD UPDATE: User with username " + updatedUser.getUsername() + " was updated");
         return userForUpdate;
@@ -286,9 +309,9 @@ public class AdminService implements AdminServiceInterface {
     public String deleteUser(long id) {
         Optional<User> userForDeleteOpt = adminRepository.findById(id);
         StringBuilder response = new StringBuilder();
-        if(!userForDeleteOpt.isPresent()) {
-            LOGGER.warn(response.append("METHOD DELETE: User with username ")
-                                .append(userForDeleteOpt.get().getUsername())
+        if(userForDeleteOpt.isEmpty()) {
+            LOGGER.warn(response.append("METHOD DELETE: User with id: ")
+                                .append(id)
                                 .append(" wasn't found"));
             throw new NoSuchElementException("Такого користувача не знайдено!");
         }
@@ -305,10 +328,9 @@ public class AdminService implements AdminServiceInterface {
 
     @Override
     public List<String> getLogs(int amountOfLogs) throws IOException {
-        List<String> response = new ArrayList<>();
         //TODO: check path on production
         Path path = Paths.get("logs/ProjectLog.log");
-        Files.readAllLines(path).forEach(str -> response.add(str));
+        List<String> response = new ArrayList<>(Files.readAllLines(path));
         if(amountOfLogs == 0) {
             return response;
         }

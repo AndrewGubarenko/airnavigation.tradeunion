@@ -7,6 +7,7 @@ import com.airnavigation.tradeunion.domain.PlainDomain.Feedback;
 import com.airnavigation.tradeunion.domain.Questionnaire;
 import com.airnavigation.tradeunion.domain.User;
 import com.airnavigation.tradeunion.exceptions.EmptyDataFieldsException;
+import com.airnavigation.tradeunion.security.Cryptographer;
 import com.airnavigation.tradeunion.services.interfaces.UserServiceInterface;
 import com.airnavigation.tradeunion.utilities.EmailServiceImpl;
 import com.airnavigation.tradeunion.utilities.TemporaryPasswordGenerator;
@@ -20,9 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserService implements UserServiceInterface {
@@ -34,18 +33,21 @@ public class UserService implements UserServiceInterface {
     private final TemporaryPasswordGenerator passwordGenerator;
     private final EmailServiceImpl emailService;
     private final PasswordEncoder passwordEncoder;
+    private final Cryptographer cryptographer;
 
     @Autowired
     public UserService (UserRepository userRepository,
                         QuestionnaireRepository questionnaireRepository,
                         TemporaryPasswordGenerator passwordGenerator,
                         EmailServiceImpl emailService,
-                        BCryptPasswordEncoder passwordEncoder) {
+                        BCryptPasswordEncoder passwordEncoder,
+                        Cryptographer cryptographer) {
         this.userRepository = userRepository;
         this.questionnaireRepository = questionnaireRepository;
         this.passwordGenerator = passwordGenerator;
         this.emailService = emailService;
         this.passwordEncoder = passwordEncoder;
+        this.cryptographer = cryptographer;
     }
 
     @Override
@@ -55,7 +57,7 @@ public class UserService implements UserServiceInterface {
         String response;
         Optional<User> userForUpdateOpt = userRepository.findById(id);
 
-        if(!userForUpdateOpt.isPresent()) {
+        if(userForUpdateOpt.isEmpty()) {
             response = "Користувача не було знайдено";
             LOGGER.warn(response);
             throw new NoSuchElementException(response);
@@ -76,13 +78,17 @@ public class UserService implements UserServiceInterface {
             try {
                 emailService.sendMimeMessage(userForUpdate.getUsername(),
                         "Зміна паролю",
-                        //TODO: repair email from
                         "andrewgubarenko@gmail.com",
-                        new StringBuilder().append("Вітаю! Ваш пароль на сайті профспілки Аеронавігація було змінено.\n")
-                                .append("З метою забезпечення безпеки Ваш новий пароль для доступу до особистого кабінету не надсилатиметься з електронною поштою.")
-                                .append("\n")
-                                .append("Якщо ви не виконували цієї дії, негайно зверніться до адміністратора. \n")
-                                .append("Увага! Цей лист згенеровано автоматично. Не відповідайте на нього.").toString(),
+                        new StringBuilder()
+                                .append("<html><body>")
+                                .append("<img src='cid:logo' alt='Logo' width='128' height='128'/>")
+                                .append("<H2>Вітаю! Ваш пароль на сайті профспілки Аеронавігація було змінено.</H2>")
+                                .append("<img src='cid:arrow' alt='Logo' width='200px'/>")
+                                .append("<p>З метою забезпечення безпеки Ваш новий пароль для доступу до особистого кабінету не надсилатиметься з електронною поштою.</p>")
+                                .append("<p>Якщо ви не виконували цієї дії, негайно зверніться до адміністратора.</p>")
+                                .append("<p>вага! Цей лист згенеровано автоматично. Не відповідайте на нього.</p>")
+                                .append("<img src='cid:arrow' alt='Logo' width='200px'/>")
+                                .append("</body></html>").toString(),
                         new ArrayList<>());
             } catch (MessagingException ex) {
                 LOGGER.info("Something wrong with email. Unable to send an email to " + userForUpdate.getUsername() + "\n" + ex.getLocalizedMessage());
@@ -97,7 +103,7 @@ public class UserService implements UserServiceInterface {
     @PostAuthorize("returnObject.username == authentication.principal.username")
     public User getUser(long id) {
         Optional<User> foundUserOpt = userRepository.findById(id);
-        if(!foundUserOpt.isPresent()) {
+        if(foundUserOpt.isEmpty()) {
             LOGGER.warn("METHOD GET_USER: User with id=" + id + " has been not found!");
             throw new NoSuchElementException("Користувача не було знайдено!");
         }
@@ -117,16 +123,21 @@ public class UserService implements UserServiceInterface {
             try {
                 emailService.sendMimeMessage(user.getUsername(),
                         "Відновлення паролю",
-                        //TODO: repair email from
                         "andrewgubarenko@gmail.com",
-                        new StringBuilder().append("Вітаю! Ваш пароль на сайті профспілки Аеронавігація було перевстановлено.\n")
-                                .append("Ваш новий тимчасовий пароль для доступу до особистого кабінету: ")
-                                .append(password)
-                                .append("\n")
-                                .append("Якщо ви не виконували цієї дії, негайно зверніться до адміністратора. \n")
-                                .append("Радимо змінити цей пароль на свій власний. \n")
-                                .append("Також радимо використовувати надійні паролі, наприклад ті, що генеруються Google.")
-                                .append("Увага! Цей лист згенеровано автоматично. Не відповідайте на нього.")
+                        new StringBuilder()
+                                .append("<html><body>")
+                                .append("<img src='cid:logo' alt='Logo' width='128' height='128'/>")
+                                .append("<H2>Вітаю! Ваш пароль на сайті профспілки Аеронавігація було перевстановлено.</H2>")
+                                .append("<img src='cid:arrow' alt='Logo' width='200px'/>")
+                                .append("<p>Ваш новий тимчасовий пароль для доступу до особистого кабінету: </p>")
+                                    .append(password)
+                                .append("</p>")
+                                .append("<p>Якщо ви не виконували цієї дії, негайно зверніться до адміністратора. </p>")
+                                .append("<p>Радимо змінити цей пароль на свій власний. </p>")
+                                .append("<p>Також радимо використовувати надійні паролі, наприклад ті, що генеруються Google.</p>")
+                                .append("<p>Увага! Цей лист згенеровано автоматично. Не відповідайте на нього.</p>")
+                                .append("<img src='cid:arrow' alt='Logo' width='200px'/>")
+                                .append("</body></html>")
                                 .toString(),
                         new ArrayList<>());
             } catch (MessagingException ex) {
@@ -153,8 +164,7 @@ public class UserService implements UserServiceInterface {
     public String receiveEmailFromUser(Feedback feedback) {
         String response;
         try {
-            //TODO: repair email to
-            emailService.sendMimeMessage("andrewgubarenko@gmail.com",
+            emailService.sendMimeMessage("aeronavua@gmail.com",
                     feedback.getTheme(),
                     feedback.getFrom(),
                     feedback.getBody(),
@@ -210,10 +220,22 @@ public class UserService implements UserServiceInterface {
             userQuestionnaire.setSeniority(questionnaire.getSeniority());
             userQuestionnaire.setIsMarried(questionnaire.getIsMarried());
             userQuestionnaire.setFamilyComposition(questionnaire.getFamilyComposition());
-
-            userQuestionnaire.setChildren(questionnaire.getChildren());
-            
             userQuestionnaire.setAdditionalInformation(questionnaire.getAdditionalInformation());
+
+            if(userQuestionnaire.getChildren() != null) {
+                Map<String, String> decryptedChildren = new LinkedHashMap<>();
+                Map<String, String> decryptedIncomeChildren = new LinkedHashMap<>();
+                userQuestionnaire.getChildren().forEach((name, date) -> decryptedChildren.put(cryptographer.decode(name), cryptographer.decode(date)));
+                questionnaire.getChildren().forEach((name, date) -> decryptedIncomeChildren.put(cryptographer.decode(name), cryptographer.decode(date)));
+                decryptedChildren.clear();
+                decryptedIncomeChildren.forEach(decryptedChildren::putIfAbsent);
+
+                userQuestionnaire.getChildren().clear();
+
+                decryptedChildren.forEach((name, date) -> userQuestionnaire.getChildren().put(cryptographer.encode(name), cryptographer.encode(date)));
+            } else {
+                userQuestionnaire.setChildren(questionnaire.getChildren());
+            }
 
             questionnaireRepository.save(userQuestionnaire);
 

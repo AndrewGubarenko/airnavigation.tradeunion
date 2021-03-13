@@ -12,7 +12,6 @@ import org.springframework.mail.MailSendException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -27,7 +26,7 @@ import java.util.NoSuchElementException;
 
 /**
  * @author Andrii Hubarenko
- * Excwption Handler
+ * Exception Handler
  */
 //TODO: remove Localized Messages before production
 @RestControllerAdvice

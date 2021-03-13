@@ -51,14 +51,24 @@ public class AdminController {
     @PutMapping(path = "/data_base", consumes = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     public ResponseEntity<Set<User>> updateDatabaseXLSX (@RequestBody byte[] file) throws IOException {
         Set<User> response = adminService.updateDB(file, "xlsx");
-        response.forEach(user -> user.setPassword(""));
+        response.forEach(user -> {
+            String encodedUsername = cryptographer.encode(user.getUsername());
+            user.setUsername(encodedUsername);
+            user.setPassword("");
+            user.setQuestionnaire(null);
+        });
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PutMapping(path = "/data_base", consumes = "application/vnd.ms-excel")
     public ResponseEntity<Set<User>> updateDatabaseXLS (@RequestBody byte[] file) throws IOException {
         Set<User> response = adminService.updateDB(file, "xls");
-        response.forEach(user -> user.setPassword(""));
+        response.forEach(user -> {
+            String encodedUsername = cryptographer.encode(user.getUsername());
+            user.setUsername(encodedUsername);
+            user.setPassword("");
+            user.setQuestionnaire(null);
+        });
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

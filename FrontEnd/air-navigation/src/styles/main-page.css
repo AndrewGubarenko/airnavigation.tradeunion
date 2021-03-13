@@ -19,8 +19,8 @@
   flex-direction: column;
 }
 
-/* standart-container */
-.standart-container {
+/* standard-container */
+.standard-container {
   margin-top: 50px;
   width: 100%;
   height: auto;
@@ -28,7 +28,7 @@
   flex-direction: column;
 }
 
-.standart-container:last-child {
+.standard-container:last-child {
   margin-bottom: 80px;
 }
 
@@ -43,7 +43,7 @@
   height: auto;
 }
 
-.standart-container-line {
+.standard-container-line {
   position: absolute;
   display: flex;
   justify-content: flex-end;
@@ -303,7 +303,7 @@
   #news__icon{
     margin: auto;
   }
-  .standart-container-line {
+  .standard-container-line {
     width: 95%;
   }
   .svg-plane-icon {

@@ -1,10 +1,10 @@
 import React from 'react';
 import Feedback from './../components/feedback';
 import {connect} from 'react-redux';
-import {setToMainDisplayMode} from './../reducers/actions/OnMainPageAction';
-import {userService} from './../app-context/context';
-import {setSpinnerVisibility} from './../reducers/actions/spinnerAction';
-import {sypherService} from './../app-context/context';
+import {setToMainDisplayMode} from '../reducers/actions/OnMainPageAction';
+import {userService} from '../app-context/context';
+import {setSpinnerVisibility} from '../reducers/actions/spinnerAction';
+import {cipherService} from '../app-context/context';
 
 let CryptoJS = require("crypto-js");
 let count = 0;
@@ -29,8 +29,6 @@ class FeedbackContainer extends React.Component {
   componentDidMount() {
     this.props.dispatch(setToMainDisplayMode("block"));
   }
-
-
 
   onChangEmailTheme = (event) => {
     this.setState({borderColorEmailTheme: "darkgrey"});
@@ -75,7 +73,7 @@ class FeedbackContainer extends React.Component {
         <span/><span className="input_file_span" >Більше файлів: </span>
       </div>
       <div className="interactive_control_panel_file_upload">
-        <span/><input id="acounts_flie_input_key" className="terminal_input_file" type="file" name="file" onChange={this.onChangeUpdateEmailFile} style={{color: this.state.emailFileInputColor}}/>
+        <span/><input id="accounts_file_input_key" className="terminal_input_file" type="file" name="file" onChange={this.onChangeUpdateEmailFile} style={{color: this.state.emailFileInputColor}}/>
       </div>
     </div>);
     this.setState({fileLoaders: fileLoaders})
@@ -91,9 +89,9 @@ class FeedbackContainer extends React.Component {
       let jsonFiles = this.state.files.map(file => {
         return(file);
       });
-      let sypheredFrom = this.cypherThis(this.state.from);
+      let cipheredFrom = this.cipherThis(this.state.from);
       let feedback = {
-        from: sypheredFrom,
+        from: cipheredFrom,
         theme: this.state.theme,
         body: this.state.body,
         files: jsonFiles
@@ -105,15 +103,14 @@ class FeedbackContainer extends React.Component {
     }
   }
 
-  cypherThis = (text) => {
+  cipherThis = (text) => {
     let iv = CryptoJS.lib.WordArray.random(128/8).toString(CryptoJS.enc.Hex);
     let salt = CryptoJS.lib.WordArray.random(128/8).toString(CryptoJS.enc.Hex);
     if(text) {
-      let ciphertext = sypherService.encrypt(salt, iv, text);
+      let ciphertext = cipherService.encrypt(salt, iv, text);
 
       let aesString = (iv + "::" + salt + "::" + ciphertext);
-      let cryptedString = btoa(aesString);
-      return cryptedString;
+      return btoa(aesString);
     } else {
       return text;
     }

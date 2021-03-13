@@ -1,10 +1,10 @@
 import React from 'react';
 import Questionnaire from './../components/questionnaire';
 import {connect} from 'react-redux';
-import {setToMainDisplayMode} from './../reducers/actions/OnMainPageAction';
-import {userService} from './../app-context/context';
-import {setSpinnerVisibility} from './../reducers/actions/spinnerAction';
-import {sypherService} from './../app-context/context';
+import {setToMainDisplayMode} from '../reducers/actions/OnMainPageAction';
+import {userService} from '../app-context/context';
+import {setSpinnerVisibility} from '../reducers/actions/spinnerAction';
+import {cipherService} from '../app-context/context';
 
 let CryptoJS = require("crypto-js");
 let count = -1;
@@ -46,6 +46,9 @@ class QuestionnaireContainer extends React.Component {
 
       childNameMap: new Map(),
       childBirthMap: new Map(),
+
+      personalDataAgreementChecked: false,
+      personalDataAgreementCheckedColor: "black",
 
       message: ""
     };
@@ -100,16 +103,16 @@ class QuestionnaireContainer extends React.Component {
         let childrenArray = this.state.childrenArray;
         this.state.children.forEach((child, i) => {
           count++;
-          childrenArray.push(<div key={count} className="questionnarie_children_row">
+          childrenArray.push(<div key={count} className="questionnaire_children_row">
             <div className="auth-container">
-              <input data-number={count} className="questionarie_terminal_input" onChange={this.onChangeChildName} value={child[0]}/>
+              <input data-number={count} className="questionnaire_terminal_input" onChange={this.onChangeChildName} value={child[0]}/>
               <span className="inscription" id="forgot_password_span">
                 ПІБ дитини
               </span>
             </div>
             <div className="auth-container" style={{position: "relative"}}>
               <div id="close__btn" data-number={count} onClick={this.onClickRemoveChild} className="remove_child_btn">&#10006;</div>
-              <input type="date" data-number={count} className="questionarie_terminal_input" onChange={this.onChangeChildBirth} value={child[1]}/>
+              <input type="date" data-number={count} className="questionnaire_terminal_input" onChange={this.onChangeChildBirth} value={child[1]}/>
               <span className="inscription" id="forgot_password_span">
                 Дата народження
               </span>
@@ -253,6 +256,15 @@ class QuestionnaireContainer extends React.Component {
     this.setState({additionalInformation: event.target.value});
   }
 
+  onChangePersonalDataAgreementChecked = () => {
+    if (!this.state.personalDataAgreementChecked) {
+      this.setState({personalDataAgreementCheckedColor: "black"});
+      this.setState({personalDataAgreementChecked: true});
+    } else {
+      this.setState({personalDataAgreementChecked: false});
+    }
+  }
+
   onClickRemoveChild = (event) => {
     let childrenArray = this.state.childrenArray;
     let key = event.target.dataset.number;
@@ -276,16 +288,16 @@ class QuestionnaireContainer extends React.Component {
     count++;
 
     let childrenArray = this.state.childrenArray;
-    await childrenArray.push(<div key={count} className="questionnarie_children_row">
+    await childrenArray.push(<div key={count} className="questionnaire_children_row">
       <div className="auth-container">
-        <input data-number={count} className="questionarie_terminal_input" onChange={this.onChangeChildName} />
+        <input data-number={count} className="questionnaire_terminal_input" onChange={this.onChangeChildName} />
         <span className="inscription" id="forgot_password_span">
           ПІБ дитини
         </span>
       </div>
       <div className="auth-container" style={{position: "relative"}}>
         <div id="close__btn" data-number={count} onClick={this.onClickRemoveChild} className="remove_child_btn">&#10006;</div>
-        <input type="date" data-number={count} className="questionarie_terminal_input" onChange={this.onChangeChildBirth}/>
+        <input type="date" data-number={count} className="questionnaire_terminal_input" onChange={this.onChangeChildBirth}/>
         <span className="inscription" id="forgot_password_span">
           Дата народження
         </span>
@@ -295,124 +307,126 @@ class QuestionnaireContainer extends React.Component {
   }
 
   onClickSaveQuestionnaire = async () => {
+    if(this.state.personalDataAgreementChecked) {
+      this.setState({personalDataAgreementCheckedColor: "black"});
+      await this.props.dispatch(setSpinnerVisibility("inline-block"));
 
-    await this.props.dispatch(setSpinnerVisibility("inline-block"));
+      let childrenMap = new Map();
+      await this.state.children.forEach((child, i) => {
+        childrenMap.set(this.cipherThis(child[0]), this.cipherThis(child[1]));
+      });
 
-    let childrenMap = new Map();
-    await this.state.children.forEach((child, i) => {
-      childrenMap.set(this.cypherThis(child[0]), this.cypherThis(child[1]));
-    });
+      await this.state.childNameMap.forEach((name,date) => {
+        let encodedName = this.cipherThis(name);
+        let encodedDate = this.cipherThis(this.state.childBirthMap.get(date))
+        childrenMap.set(encodedName, encodedDate);
+      });
 
-    await this.state.childNameMap.forEach((name,date) => {
-      let encodedName = this.cypherThis(name);
-      let encodedDate = this.cypherThis(this.state.childBirthMap.get(date))
-      childrenMap.set(encodedName, encodedDate);
-    });
+      //Making JS Map compatible for JSON.Stringify
+      let childrenMapCompatible = Object.fromEntries(childrenMap);
 
-    //Making JS Map compatible for JSON.Stringify
-    let childrenMapCompatible = Object.fromEntries(childrenMap);
-
-    let questionnaire = {
-      nameUkrainian: this.cypherThis(this.state.nameUkrainian),
-      nameEnglish: this.cypherThis(this.state.nameEnglish),
-      facility: this.cypherThis(this.state.facility),
-      position: this.cypherThis(this.state.position),
-      shift: this.cypherThis(this.state.shift),
-      passportNumber: this.cypherThis(this.state.passportNumber),
-      passportIssue: this.cypherThis(this.state.passportIssue),
-      passportDateIssue: this.cypherThis(this.state.passportDateIssue),
-      doesHaveInternationalPassport: this.cypherThis(this.state.doesHaveInternationalPassport),
-      termInternationalPassport: this.cypherThis(this.state.termInternationalPassport),
-      identNumber: this.cypherThis(this.state.identNumber),
-      education: this.cypherThis(this.state.education),
-      educationTerm: this.cypherThis(this.state.educationTerm),
-      homePhone: this.cypherThis(this.state.homePhone),
-      mobilePhone: this.cypherThis(this.state.mobilePhone),
-      placeOfBirth: this.cypherThis(this.state.placeOfBirth),
-      birthDate: this.cypherThis(this.state.birthDate),
-      passportAddress: this.cypherThis(this.state.passportAddress),
-      actualAddress: this.cypherThis(this.state.actualAddress),
-      employmentDate: this.cypherThis(this.state.employmentDate),
-      seniority: this.cypherThis(this.state.seniority),
-      isMarried: this.cypherThis(this.state.isMarried),
-      familyComposition: this.cypherThis(this.state.familyComposition),
-      children: childrenMapCompatible,
-      additionalInformation: this.cypherThis(this.state.additionalInformation),
-      userId: this.props.user.id
-    }
-    await userService.sendQuestionnaire(questionnaire, this.props.user.id).then(response => {
-      if(response.ok) {
-        response.json().then(data => {
-          this.setQuestionnarieData(data);
-        })
-      } else {
-        response.text().then(message => {
-          this.setState({message: message});
-        })
+      let questionnaire = {
+        nameUkrainian: this.cipherThis(this.state.nameUkrainian),
+        nameEnglish: this.cipherThis(this.state.nameEnglish),
+        facility: this.cipherThis(this.state.facility),
+        position: this.cipherThis(this.state.position),
+        shift: this.cipherThis(this.state.shift),
+        passportNumber: this.cipherThis(this.state.passportNumber),
+        passportIssue: this.cipherThis(this.state.passportIssue),
+        passportDateIssue: this.cipherThis(this.state.passportDateIssue),
+        doesHaveInternationalPassport: this.cipherThis(this.state.doesHaveInternationalPassport),
+        termInternationalPassport: this.cipherThis(this.state.termInternationalPassport),
+        identNumber: this.cipherThis(this.state.identNumber),
+        education: this.cipherThis(this.state.education),
+        educationTerm: this.cipherThis(this.state.educationTerm),
+        homePhone: this.cipherThis(this.state.homePhone),
+        mobilePhone: this.cipherThis(this.state.mobilePhone),
+        placeOfBirth: this.cipherThis(this.state.placeOfBirth),
+        birthDate: this.cipherThis(this.state.birthDate),
+        passportAddress: this.cipherThis(this.state.passportAddress),
+        actualAddress: this.cipherThis(this.state.actualAddress),
+        employmentDate: this.cipherThis(this.state.employmentDate),
+        seniority: this.cipherThis(this.state.seniority),
+        isMarried: this.cipherThis(this.state.isMarried),
+        familyComposition: this.cipherThis(this.state.familyComposition),
+        children: childrenMapCompatible,
+        additionalInformation: this.cipherThis(this.state.additionalInformation),
+        userId: this.props.user.id
       }
-    });
-    await this.props.dispatch(setSpinnerVisibility("none"));
+      await userService.sendQuestionnaire(questionnaire, this.props.user.id).then(response => {
+        if(response.ok) {
+          response.json().then(data => {
+            this.setQuestionnarieData(data);
+          })
+        } else {
+          response.text().then(message => {
+            this.setState({message: message});
+          })
+        }
+      });
+      await this.props.dispatch(setSpinnerVisibility("none"));
+    } else {
+      this.setState({personalDataAgreementCheckedColor: "red"});
+    }
   }
 
   setQuestionnarieData = (data) => {
-    this.setState({nameUkrainian: this.decypherThis(data.nameUkrainian)});
-    this.setState({nameEnglish: this.decypherThis(data.nameEnglish)});
-    this.setState({facility: this.decypherThis(data.facility)});
-    this.setState({position: this.decypherThis(data.position)});
-    this.setState({shift: this.decypherThis(data.shift)});
-    this.setState({passportNumber: this.decypherThis(data.passportNumber)});
-    this.setState({passportIssue: this.decypherThis(data.passportIssue)});
-    this.setState({passportDateIssue: this.decypherThis(data.passportDateIssue)});
-    this.setState({doesHaveInternationalPassport: this.decypherThis(data.doesHaveInternationalPassport)});
-    this.setState({termInternationalPassport: this.decypherThis(data.termInternationalPassport)});
-    this.setState({identNumber: this.decypherThis(data.identNumber)});
-    this.setState({education: this.decypherThis(data.education)});
-    this.setState({educationTerm: this.decypherThis(data.educationTerm)});
-    this.setState({homePhone: this.decypherThis(data.homePhone)});
-    this.setState({mobilePhone: this.decypherThis(data.mobilePhone)});
-    this.setState({placeOfBirth: this.decypherThis(data.placeOfBirth)});
-    this.setState({birthDate: this.decypherThis(data.birthDate)});
-    this.setState({passportAddress: this.decypherThis(data.passportAddress)});
-    this.setState({actualAddress: this.decypherThis(data.actualAddress)});
-    this.setState({employmentDate: this.decypherThis(data.employmentDate)});
-    this.setState({seniority: this.decypherThis(data.seniority)});
-    this.setState({isMarried: this.decypherThis(data.isMarried)});
-    this.setState({familyComposition: this.decypherThis(data.familyComposition)});
+    this.setState({nameUkrainian: this.decipherThis(data.nameUkrainian)});
+    this.setState({nameEnglish: this.decipherThis(data.nameEnglish)});
+    this.setState({facility: this.decipherThis(data.facility)});
+    this.setState({position: this.decipherThis(data.position)});
+    this.setState({shift: this.decipherThis(data.shift)});
+    this.setState({passportNumber: this.decipherThis(data.passportNumber)});
+    this.setState({passportIssue: this.decipherThis(data.passportIssue)});
+    this.setState({passportDateIssue: this.decipherThis(data.passportDateIssue)});
+    this.setState({doesHaveInternationalPassport: this.decipherThis(data.doesHaveInternationalPassport)});
+    this.setState({termInternationalPassport: this.decipherThis(data.termInternationalPassport)});
+    this.setState({identNumber: this.decipherThis(data.identNumber)});
+    this.setState({education: this.decipherThis(data.education)});
+    this.setState({educationTerm: this.decipherThis(data.educationTerm)});
+    this.setState({homePhone: this.decipherThis(data.homePhone)});
+    this.setState({mobilePhone: this.decipherThis(data.mobilePhone)});
+    this.setState({placeOfBirth: this.decipherThis(data.placeOfBirth)});
+    this.setState({birthDate: this.decipherThis(data.birthDate)});
+    this.setState({passportAddress: this.decipherThis(data.passportAddress)});
+    this.setState({actualAddress: this.decipherThis(data.actualAddress)});
+    this.setState({employmentDate: this.decipherThis(data.employmentDate)});
+    this.setState({seniority: this.decipherThis(data.seniority)});
+    this.setState({isMarried: this.decipherThis(data.isMarried)});
+    this.setState({familyComposition: this.decipherThis(data.familyComposition)});
 
     let decodedMap = this.state.children;
     Object.entries(data.children).forEach(async(name, index) => {
 
-      let childName = this.decypherThis(name[0]);
-      let childDate = this.decypherThis(name[1]);
+      let childName = this.decipherThis(name[0]);
+      let childDate = this.decipherThis(name[1]);
 
       decodedMap.push([childName, childDate]);
     });
     this.setState({children: decodedMap});
 
-    this.setState({additionalInformation: this.decypherThis(data.additionalInformation)});
+    this.setState({additionalInformation: this.decipherThis(data.additionalInformation)});
   }
 
-  cypherThis = (text) => {
+  cipherThis = (text) => {
     let iv = CryptoJS.lib.WordArray.random(128/8).toString(CryptoJS.enc.Hex);
     let salt = CryptoJS.lib.WordArray.random(128/8).toString(CryptoJS.enc.Hex);
     if(text) {
-      let ciphertext = sypherService.encrypt(salt, iv, text);
+      let ciphertext = cipherService.encrypt(salt, iv, text);
 
       let aesString = (iv + "::" + salt + "::" + ciphertext);
-      let cryptedString = btoa(aesString);
-      return cryptedString;
+      return btoa(aesString);
     } else {
       return text;
     }
   }
 
-  decypherThis = (encryptedText) => {
+  decipherThis = (encryptedText) => {
     if(encryptedText) {
       let decodedText = atob(encryptedText);
       let aesString = decodedText.split("::");
       let ciphertext = aesString[2];
-      let decryptedText = sypherService.decrypt(aesString[1], aesString[0], ciphertext);
-      return decryptedText;
+      return cipherService.decrypt(aesString[1], aesString[0], ciphertext);
     } else {
       return encryptedText;
     }
@@ -446,6 +460,8 @@ class QuestionnaireContainer extends React.Component {
         familyComposition={this.state.familyComposition}
         children={this.state.children}
         additionalInformation={this.state.additionalInformation}
+        personalDataAgreementChecked={this.state.personalDataAgreementChecked}
+        personalDataAgreementCheckedColor={this.state.personalDataAgreementCheckedColor}
 
         isTermIntPassVisible={this.state.isTermIntPassVisible}
         isMarriedSpan={this.state.isMarriedSpan}
@@ -476,6 +492,7 @@ class QuestionnaireContainer extends React.Component {
         onChangeIsMarried={this.onChangeIsMarried}
         onChangeFamilyComposition={this.onChangeFamilyComposition}
         onChangeAdditionalInformation={this.onChangeAdditionalInformation}
+        onChangePersonalDataAgreementChecked={this.onChangePersonalDataAgreementChecked}
         onClickAddChild={this.onClickAddChild}
 
         onClickSaveQuestionnaire={this.onClickSaveQuestionnaire}

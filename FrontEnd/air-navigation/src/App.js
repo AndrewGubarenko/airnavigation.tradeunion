@@ -12,6 +12,9 @@ import SpinnerContainer from './containers/spinner-container';
 import GoUpButtonContainer from './containers/GoUpButtonContainer';
 import FeedbackContainer from './containers/feedbackContainer';
 import QuestionnaireContainer from './containers/questionnaire_container';
+import UserAgreement from './components/user_agreement';
+import PersonalDataProcessing from './components/personal_data_processing';
+
 import './App.css';
 import {Provider} from 'react-redux';
 import {store, persistor} from './reducers/store';
@@ -80,6 +83,8 @@ class App extends Component {
                 }
               }
             }/>
+            <Route path="/user_agreement" component={UserAgreement} />
+            <Route path="/personal_data_processing" component={PersonalDataProcessing} />
             <Route path="/" component={Footer} />
           </BrowserRouter>
         </PersistGate>

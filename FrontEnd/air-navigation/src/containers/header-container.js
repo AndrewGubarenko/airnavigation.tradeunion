@@ -103,7 +103,7 @@ class HeaderContainer extends React.Component {
   logInOrLogOut = () => {
       if (this.props.isAuthenticated) {
         return(
-          <li className="menu-li burget_menu_li"
+          <li className="menu-li burger_menu_li"
               onClick={() => {
                 userService.logout().then(response => {
                   if(response.ok) {
@@ -121,7 +121,7 @@ class HeaderContainer extends React.Component {
         );
       } else {
         return(
-          <li className="menu-li burget_menu_li">
+          <li className="menu-li burger_menu_li">
             <div key="logInDiv" onClick={this.showLoginForm}
             >Увійти</div>
           </li>

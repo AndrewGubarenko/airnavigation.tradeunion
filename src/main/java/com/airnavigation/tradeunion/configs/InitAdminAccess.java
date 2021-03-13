@@ -41,11 +41,9 @@ class InitAdminAccess {
     @PostConstruct
     @Transactional
     protected void createDefaultUsers() {
-        //TODO: Repair this row
-        String password = "123"/*passwordGenerator.generateTemporaryPassword(30)*/;
+        String password = passwordGenerator.generateTemporaryPassword(30);
         User user = adminRepository.save(
-                //TODO: Repair this row
-                User.builder().username("123")
+                User.builder().username("andrewgubarenko@gmail.com")
                         .password(passwordEncoder.encode(password))
                         .firstName("Андрій Сергійович")
                         .lastName("Губаренко")
@@ -54,23 +52,27 @@ class InitAdminAccess {
                         .roles(new HashSet<>(Arrays.asList(Role.ADMINISTRATOR, Role.USER)))
                         .build()
         );
-        //TODO: Enable this module before production
-/*        try {
+        try {
             emailService.sendMimeMessage(user.getUsername(),
                     "Реєстрація користувача",
                     "andrewgubarenko@gmail.com",
-                    new StringBuilder().append("<H2>Вітаю! Вас зареєстровано на сайті профспілки Аеронавігація.</H2>\n")
-                            .append("<p>Ваш тимчасовий пароль для доступу до особистого кабінету: ")
-                            .append(password)
-                            .append("</p>")
-                            .append("\n")
-                            .append("<p>Радимо змінити цей пароль на свій власний. </p>\n")
-                            .append("<p>Також радимо використовувати надійні паролі, наприклад ті, що генеруються Google.</p>")
-                            .append("<p>Увага! Цей лист згенеровано автоматично. Не відповідайте на нього.</p>").toString(),
+                    new StringBuilder()
+                            .append("<html><body>")
+                                .append("<img src='cid:logo' alt='Logo' width='128' height='128'/>")
+                                .append("<H2>Вітаю! Вас зареєстровано на сайті профспілки Аеронавігація.</H2>")
+                                .append("<img src='cid:arrow' alt='Logo' width='200px'/>")
+                                .append("<p>Ваш тимчасовий пароль для доступу до особистого кабінету: ")
+                                    .append(password)
+                                .append("</p>")
+                                .append("<p>Радимо змінити цей пароль на свій власний. </p>\n")
+                                .append("<p>Також радимо використовувати надійні паролі, наприклад ті, що генеруються Google.</p>")
+                                .append("<p>Увага! Цей лист згенеровано автоматично. Не відповідайте на нього.</p>")
+                                .append("<img src='cid:arrow' alt='Logo' width='200px'/>")
+                            .append("</body></html>").toString(),
                     new ArrayList<>());
         } catch (MessagingException ex) {
             LOGGER.info("Something wrong with email. Unable to send an email to " + user.getUsername() + "\n" + ex.getLocalizedMessage());
-        }*/
+        }
         LOGGER.info("METHOD CREATE: User with username: " + user.getUsername() + " and access level:" + Role.ADMINISTRATOR.name() + " was created");
     }
 }

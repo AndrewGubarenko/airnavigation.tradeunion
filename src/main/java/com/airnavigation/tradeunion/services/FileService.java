@@ -168,9 +168,8 @@ public class FileService {
                 response.append("Files with subCategory ")
                         .append(subCategoryName.trim().toLowerCase())
                         .append(": ");
-                for(Iterator<File> iterator = fileList.iterator(); iterator.hasNext(); ) {
-                    File file = iterator.next();
-                    if(file.getSubCategory().equals(subCategoryName.trim().toLowerCase())) {
+                for (File file : fileList) {
+                    if (file.getSubCategory().equals(subCategoryName.trim().toLowerCase())) {
                         isReadyForRemove++;
                         response.append(file.getName())
                                 .append(", ");

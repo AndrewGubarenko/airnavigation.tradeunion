@@ -169,6 +169,12 @@ export default class AdminService {
   /*Logs*/
   /*Reports*/
   getFullReport() {
+    return fetch(this.startUrl + "/full_report", {
+      method: "get"
+    });
+  }
+
+  getChildrenReport() {
     return fetch(this.startUrl + "/children_report", {
       method: "get"
     });

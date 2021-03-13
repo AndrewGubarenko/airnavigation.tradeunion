@@ -21,7 +21,7 @@ class Feedback extends React.Component {
               <span/><span className="input_file_span" >Виберіть файли для відправки: </span>
             </div>
             <div className="interactive_control_panel_file_upload">
-              <span/><input id="acounts_flie_input_key" className="terminal_input_file" type="file" name="file" onChange={this.props.onChangeUpdateEmailFile} style={{color: this.props.emailFileInputColor}}/>
+              <span/><input id="accounts_file_input_key" className="terminal_input_file" type="file" name="file" onChange={this.props.onChangeUpdateEmailFile} style={{color: this.props.emailFileInputColor}}/>
             </div>
             {this.props.fileLoaders.map(loader => {return(loader)})}
             <button className="admin_screen_btn" onClick={this.props.onClickAddFileLoader} style={{fontSize: "18px", marginTop: "20px"}}>Більше файлів</button>

@@ -41,20 +41,20 @@ class Header extends React.Component {
           </label>
 
             <ul className="menu__box">
-              <li className="menu-li burget_menu_li" style={{display: this.props.toMainDisplayMode}}>
+              <li className="menu-li burger_menu_li" style={{display: this.props.toMainDisplayMode}}>
                 <div key="toMain" className="click_me" onClick={this.props.onClickToMain}
                 >Головна</div>
               </li>
-              <li className="menu-li burget_menu_li">
+              <li className="menu-li burger_menu_li">
                 <div key="newsDiv" className="click_me" onClick={this.props.onClickToNews}
                 >Новини</div>
               </li>
-              <li className="menu-li burget_menu_li">
+              <li className="menu-li burger_menu_li">
                 <div key="filesDiv" className="click_me" onClick={this.props.onClickToFiles}
                 >Документи</div>
               </li>
               {this.props.logInOrLogOut()}
-              <li className="menu-li burget_menu_li" style={{color: this.props.adminLinkColor, display: this.props.adminDisplayMode, transition: "color 0.2s linear"}} onMouseEnter={this.props.onMouseEnter} onMouseLeave={this.props.onMouseLeave}>
+              <li className="menu-li burger_menu_li" style={{color: this.props.adminLinkColor, display: this.props.adminDisplayMode, transition: "color 0.2s linear"}} onMouseEnter={this.props.onMouseEnter} onMouseLeave={this.props.onMouseLeave}>
                 <div key="adminDiv" className="click_me" onClick={this.props.onClickToAdmin}
                 >Admin</div>
               </li>

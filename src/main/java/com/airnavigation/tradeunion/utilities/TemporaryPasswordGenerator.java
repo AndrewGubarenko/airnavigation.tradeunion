@@ -37,8 +37,7 @@ public class TemporaryPasswordGenerator {
         CharacterRule splCharRule = new CharacterRule(specialChars);
         splCharRule.setNumberOfCharacters(2);
 
-        String password = gen.generatePassword(length, splCharRule, lowerCaseRule,
+        return gen.generatePassword(length, splCharRule, lowerCaseRule,
                 upperCaseRule, digitRule);
-        return password;
     }
 }

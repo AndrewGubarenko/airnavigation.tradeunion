@@ -8,7 +8,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +30,7 @@ public class AuthenticationProviderImplementation implements AuthenticationProvi
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 
-        String username = cryptographer.decode(authentication.getName());
+        String username = cryptographer.decode(authentication.getName()).toLowerCase();
         String password = cryptographer.decode(authentication.getCredentials().toString());
 
         if(userService == null) {

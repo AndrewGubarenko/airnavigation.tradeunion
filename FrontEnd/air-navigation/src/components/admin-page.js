@@ -13,9 +13,9 @@ class AdminPage extends React.Component {
             <li className="admin_menu_list_item" onClick={this.props.onClickListOfNews}>List of news</li>
             <li className="admin_menu_list_item" onClick={this.props.onClickListOfFiles}>List of files</li>
             <li className="admin_menu_list_item" onClick={this.props.onClickGetLogs}>Get Logs</li>
-            <li className="admin_menu_list_item" onClick={this.props.onClicUpdateAcounts}>Update acounts</li>
-            <li className="admin_menu_list_item" onClick={this.props.onClicUpdateDataBase}>Update Data base</li>
-            <li className="admin_menu_list_item" onClick={this.props.onClicReports}>Reports</li>
+            <li className="admin_menu_list_item" onClick={this.props.onClickUpdateAccounts}>Update accounts</li>
+            <li className="admin_menu_list_item" onClick={this.props.onClickUpdateDataBase}>Update Data base</li>
+            <li className="admin_menu_list_item" onClick={this.props.onClickReports}>Reports</li>
           </ul>
         </div>
         <div id="screen">
@@ -209,12 +209,12 @@ class AdminPage extends React.Component {
 {/*logs panels*/}
 
 {/*Files upload functions*/}
-            <div className="interactive_control_panel" style={{display: this.props.XMLCountUodateControlPanelDisplay}}>
+            <div className="interactive_control_panel" style={{display: this.props.XMLCountUpdateControlPanelDisplay}}>
               <div className="interactive_control_panel_file_upload">
                 <span/><span className="input_file_span" >Choose file to update accounts: </span>
               </div>
               <div className="interactive_control_panel_file_upload">
-                <span/><input id="acounts_flie_input_key" className="terminal_input_file" type="file" name="file" onChange={this.props.onChangeUpdateCountFile} style={{color: this.props.fileInputColor}}/>
+                <span/><input id="accounts_file_input_key" className="terminal_input_file" type="file" name="file" onChange={this.props.onChangeUpdateCountFile} style={{color: this.props.fileInputColor}}/>
               </div>
               <button className="admin_screen_btn" onClick={this.props.onClickUploadCountFile}>Update</button>
             </div>
@@ -224,7 +224,7 @@ class AdminPage extends React.Component {
                 <span/><span className="input_file_span" >Choose file to update DB: </span>
               </div>
               <div className="interactive_control_panel_file_upload">
-                <span/><input id="db_flie_input_key" className="terminal_input_file" type="file" name="file" onChange={this.props.onChangeUpdateDatabaseFile} style={{color: this.props.fileInputColor}}/>
+                <span/><input id="db_file_input_key" className="terminal_input_file" type="file" name="file" onChange={this.props.onChangeUpdateDatabaseFile} style={{color: this.props.fileInputColor}}/>
               </div>
               <button className="admin_screen_btn" onClick={this.props.onClickUploadDatabaseFile}>Update</button>
             </div>
@@ -233,7 +233,8 @@ class AdminPage extends React.Component {
 
 {/*Reports panel*/}
             <div className="interactive_button_container" style={{display: this.props.reportsControlPanelDisplay}}>
-              <button className="admin_screen_btn" onClick={this.props.onClickGetFullReport} style={{width: "auto"}}>Get Full Report</button>
+              <button className="admin_screen_btn" onClick={this.props.onClickGetFullReport} style={{width: "100%"}}>Get Full Report</button>
+              <button className="admin_screen_btn" onClick={this.props.onClickGetChildrenReport} style={{width: "100%"}}>Get Children Report</button>
             </div>
 {/*Reports panel*/}
 

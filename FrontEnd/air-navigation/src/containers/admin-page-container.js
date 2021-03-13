@@ -1,11 +1,11 @@
 import React from 'react';
 import AdminPage from '../components/admin-page';
-import {adminService} from './../app-context/context';
-import {setToMainDisplayMode} from './../reducers/actions/OnMainPageAction';
-import {setSpinnerVisibility} from './../reducers/actions/spinnerAction';
+import {adminService} from '../app-context/context';
+import {setToMainDisplayMode} from '../reducers/actions/OnMainPageAction';
+import {setSpinnerVisibility} from '../reducers/actions/spinnerAction';
 import {connect} from 'react-redux';
 import {scroller} from 'react-scroll';
-import {sypherService} from './../app-context/context';
+import {cipherService} from '../app-context/context';
 
 let CryptoJS = require("crypto-js");
 
@@ -68,7 +68,7 @@ class AdminPageContainer extends React.Component {
       DeleteFileYesNoContainerDisplay: "none",
       DeleteCategoryButtonDisplay: "none",
       DeleteCategoryYesNoContainerDisplay: "none",
-      XMLCountUodateControlPanelDisplay: "none",
+      XMLCountUpdateControlPanelDisplay: "none",
       XMLDatabaseUpdateControlPanelDisplay: "none",
       categoriesUpdateControlPanelDisplay: "none",
       logsControlPanelDisplay: "none",
@@ -102,8 +102,8 @@ class AdminPageContainer extends React.Component {
   }
 
   clearState = () => {
-      document.getElementById('acounts_flie_input_key').value = '';
-      document.getElementById('db_flie_input_key').value = '';
+      document.getElementById('accounts_file_input_key').value = '';
+      document.getElementById('db_file_input_key').value = '';
       this.setState({username: "",
                       user: {
                         id: "",
@@ -157,7 +157,7 @@ class AdminPageContainer extends React.Component {
                       DeleteFileYesNoContainerDisplay: "none",
                       DeleteCategoryButtonDisplay: "none",
                       DeleteCategoryYesNoContainerDisplay: "none",
-                      XMLCountUodateControlPanelDisplay: "none",
+                      XMLCountUpdateControlPanelDisplay: "none",
                       XMLDatabaseUpdateControlPanelDisplay: "none",
                       logsControlPanelDisplay: "none",
                       categoriesUpdateControlPanelDisplay: "none",
@@ -211,7 +211,7 @@ class AdminPageContainer extends React.Component {
     this.setState({selected: event.target.value})
     this.setState({user: user});
   }
-  onChangeUserRole = (event) => {
+  onChangeUserRole = () => {
     const user = this.state.user;
     if (!this.state.checked) {
       this.setState({checked: true})
@@ -243,11 +243,13 @@ class AdminPageContainer extends React.Component {
       this.setState({borderColorCount: "red"});
     } else {
       let user = this.state.user;
-      let encryptedUsername = this.cypherThis(user.username);
+      let encryptedUsername = this.cipherThis(user.username);
       user.username = encryptedUsername;
       adminService.createUser(user).then(response => {
         if(response.ok) {
           return response.json().then(data => {
+            let username = this.decipherThis(data.username);
+            data.username = username;
             this.setState({user: data})
             this.setState({userControlPanelDisplay: "none"});
             this.setState({userUpdateControlPanelDisplay: "block"});
@@ -272,14 +274,19 @@ class AdminPageContainer extends React.Component {
     } else if(Number.parseFloat(this.state.user.count) !== 0 && !Number.parseFloat(this.state.user.count)) {
       this.setState({borderColorCount: "red"});
     } else {
-      adminService.updateUser(this.state.user).then(response => {
+      let user = this.state.user;
+      let username = this.cipherThis(this.state.user.username);
+      user.username = username;
+      adminService.updateUser(user).then(response => {
         if(response.ok) {
           return response.json().then(data => {
+            let username = this.decipherThis(data.username);
+            data.username = username;
             this.setState({selected: data.gender});
             if(data.roles.includes("ADMINISTRATOR")) {
               this.setState({checked: true});
             }
-            this.setState({terminalData: JSON.stringify(data)});
+            this.setState({terminalData: JSON.stringify(data)})
             this.setState({user: data});
           });
         } else {
@@ -440,7 +447,7 @@ class AdminPageContainer extends React.Component {
     this.setState({borderColorCatName: "darkgrey"});
     const category = this.state.category;
     category.name = event.target.value;
-    this.setState({ficategoryle: category});
+    this.setState({category: category});
   }
 
   setSelection = () => {
@@ -643,7 +650,7 @@ class AdminPageContainer extends React.Component {
           <div>
               {
                 list.map(item => {
-                  let decryptedUsername = this.decypherThis(item.username);
+                  let decryptedUsername = this.decipherThis(item.username);
                   item.username = decryptedUsername;
                   return(
                     <div key={item.id} className="admin_result_list_item" style={{cursor: "pointer"}} onClick={async() => {
@@ -886,11 +893,11 @@ class AdminPageContainer extends React.Component {
   }
 /*Menu functions*/
 /*Files upload functions*/
-  onClicUpdateAcounts = () => {
+  onClickUpdateAccounts = () => {
     this.clearState();
-    this.setState({XMLCountUodateControlPanelDisplay: "block"});
+    this.setState({XMLCountUpdateControlPanelDisplay: "block"});
   }
-  onClicUpdateDataBase = () => {
+  onClickUpdateDataBase = () => {
     this.clearState();
     this.setState({XMLDatabaseUpdateControlPanelDisplay: "block"});
   }
@@ -909,6 +916,7 @@ class AdminPageContainer extends React.Component {
     this.props.dispatch(setSpinnerVisibility("inline-block"));
     await adminService.updateCounts(this.state.selectedCountFile).then(response => {
       if(response.ok) {
+        let count = 0;
         return response.json().then(array => {
         return array.map(item => {
           let color;
@@ -917,7 +925,7 @@ class AdminPageContainer extends React.Component {
           } else {
             color = "red";
           }
-          return(<pre style={{color: color}}>{item}</pre>);
+          return(<pre key={count} style={{color: color}}>{++count + ") " + item}</pre>);
           })
         }).then(result => {
           this.setState({terminalData: result});
@@ -961,7 +969,7 @@ class AdminPageContainer extends React.Component {
 
 /*Files upload functions*/
 /*Reports functions*/
-  onClicReports = () => {
+  onClickReports = () => {
     this.clearState();
     this.setState({reportsControlPanelDisplay: "block"});
   }
@@ -991,28 +999,53 @@ class AdminPageContainer extends React.Component {
       this.props.dispatch(setSpinnerVisibility("none"));
     })
   }
-/*Reports functions*/
 
-  cypherThis = (text) => {
+  onClickGetChildrenReport = () => {
+    this.props.dispatch(setSpinnerVisibility("inline-block"));
+    adminService.getChildrenReport().then(response => {
+      if(response.ok) {
+        response.text().then(message => {
+          let element = document.createElement('a');
+          element.setAttribute('href', 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,' + encodeURIComponent(message));
+          element.setAttribute('download', "children_report.xlsx");
+
+          element.style.display = 'none';
+          document.body.appendChild(element);
+
+          element.click();
+
+          document.body.removeChild(element);
+
+        });
+      } else {
+        response.text().then(message => {
+          this.setState({terminalData: message});
+        });
+      }
+      this.props.dispatch(setSpinnerVisibility("none"));
+    })
+  }
+/*Reports functions*/
+  cipherThis = (text) => {
     let iv = CryptoJS.lib.WordArray.random(128/8).toString(CryptoJS.enc.Hex);
     let salt = CryptoJS.lib.WordArray.random(128/8).toString(CryptoJS.enc.Hex);
     if(text) {
-      let ciphertext = sypherService.encrypt(salt, iv, text);
+      let ciphertext = cipherService.encrypt(salt, iv, text);
 
       let aesString = (iv + "::" + salt + "::" + ciphertext);
-      let cryptedString = btoa(aesString);
-      return cryptedString;
+      let encryptedString = btoa(aesString);
+      return encryptedString;
     } else {
       return text;
     }
   }
 
-  decypherThis = (encryptedText) => {
+  decipherThis = (encryptedText) => {
     if(encryptedText) {
       let decodedText = atob(encryptedText);
       let aesString = decodedText.split("::");
       let ciphertext = aesString[2];
-      let decryptedText = sypherService.decrypt(aesString[1], aesString[0], ciphertext);
+      let decryptedText = cipherService.decrypt(aesString[1], aesString[0], ciphertext);
       return decryptedText;
     } else {
       return encryptedText;
@@ -1118,18 +1151,19 @@ class AdminPageContainer extends React.Component {
 
         onClickSingleNew={this.onClickSingleNew}
 
-        onClicUpdateAcounts={this.onClicUpdateAcounts}
-        onClicUpdateDataBase={this.onClicUpdateDataBase}
+        onClickUpdateAccounts={this.onClickUpdateAccounts}
+        onClickUpdateDataBase={this.onClickUpdateDataBase}
         onChangeUpdateCountFile={this.onChangeUpdateCountFile}
-        XMLCountUodateControlPanelDisplay={this.state.XMLCountUodateControlPanelDisplay}
+        XMLCountUpdateControlPanelDisplay={this.state.XMLCountUpdateControlPanelDisplay}
         onClickUploadCountFile={this.onClickUploadCountFile}
         fileInputColor={this.state.fileInputColor}
         XMLDatabaseUpdateControlPanelDisplay={this.state.XMLDatabaseUpdateControlPanelDisplay}
         onChangeUpdateDatabaseFile={this.onChangeUpdateDatabaseFile}
         onClickUploadDatabaseFile={this.onClickUploadDatabaseFile}
 
-        onClicReports={this.onClicReports}
+        onClickReports={this.onClickReports}
         onClickGetFullReport={this.onClickGetFullReport}
+        onClickGetChildrenReport={this.onClickGetChildrenReport}
 
         onChangeAmount={this.onChangeAmount}
         onClickGetAmountOfLogs={this.onClickGetAmountOfLogs}
